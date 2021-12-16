@@ -19,5 +19,9 @@ class MainViewModel :ViewModel() {
     fun isNetworkUrl() : Boolean = URLUtil.isNetworkUrl(this.myURL.value.text)
 
 
-    val shortURL = mutableStateOf("")
+    val shortURL = mutableStateOf(TextFieldValue(""))
+
+    fun shortURLChange(url: String) {
+        this.shortURL.value = TextFieldValue(url)
+    }
 }

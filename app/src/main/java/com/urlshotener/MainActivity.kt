@@ -1,46 +1,38 @@
 package com.urlshotener
 
 import android.os.Bundle
-import android.view.ViewGroup
-import android.view.WindowInsets
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.activity.viewModels
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.view.ViewCompat
-import androidx.lifecycle.ViewTreeLifecycleOwner
-import com.urlshotener.ui.component.SharePage
-import com.urlshotener.ui.theme.URLShotenerTheme
+import androidx.core.view.WindowCompat
+import com.urlshotener.data.UrlShortenerViewModel
+import com.urlshotener.data.UrlShortenerViewModelFactory
+import com.urlshotener.data.URLItemRoomDataBase
+import com.urlshotener.ui.page.Test
+import com.urlshotener.ui.theme.ComposeTestTheme
 
 class MainActivity : ComponentActivity() {
+
+    val database: URLItemRoomDataBase by lazy { URLItemRoomDataBase.getDatabase(this) }
+    private val urlShortenerViewModel: UrlShortenerViewModel by viewModels {
+        UrlShortenerViewModelFactory(
+            (application as UrlShortenerApplication).database
+                .urlItemDao()
+        )
+    }
+    private val viewModel by viewModels<MainViewModel>()
+
+    @ExperimentalMaterial3Api
     @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            URLShotenerTheme {
-                // A surface container using the 'background' color from the theme
-                SharePage()
+            ComposeTestTheme {
+                Test()
             }
         }
-
-        ViewCompat.getWindowInsetsController(window.decorView)
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    URLShotenerTheme {
-        Greeting("Android")
     }
 }

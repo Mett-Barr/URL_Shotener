@@ -12,13 +12,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.urlshotener.ui.theme.URLTypography
 
 @Composable
 fun CustomTextField(
     modifier: Modifier = Modifier,
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    enabled: Boolean = true,
+    readOnly: Boolean = false,
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null
@@ -28,18 +29,54 @@ fun CustomTextField(
             .fillMaxWidth()
             .wrapContentHeight()
             .then(modifier),
-        elevation = 16.dp,
+        elevation = 8.dp,
         shape = RoundedCornerShape(10.dp)
     ) {
         TextField(
             value = textFieldValue,
             onValueChange = onValueChange,
-            enabled = enabled,
+            readOnly = readOnly,
             label = label,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
 
             placeholder = { Text("My URL") },
+            textStyle = URLTypography,
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+        )
+    }
+}
+
+@Composable
+fun CustomTextFieldM3(
+    modifier: Modifier = Modifier,
+    textFieldValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    readOnly: Boolean = false,
+    label: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .then(modifier),
+        elevation = 8.dp,
+        shape = RoundedCornerShape(10.dp)
+    ) {
+        TextField(
+            value = textFieldValue,
+            onValueChange = onValueChange,
+            readOnly = readOnly,
+            label = label,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+
+            placeholder = { androidx.compose.material3.Text("My URL") },
             textStyle = TextStyle(
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
@@ -52,3 +89,4 @@ fun CustomTextField(
         )
     }
 }
+

@@ -1,6 +1,7 @@
-package com.urlshotener.ui.component
+package com.urlshotener.ui.page
 
 import android.app.Activity
+import android.content.res.Resources
 import android.util.Log
 import android.view.WindowInsets
 import androidx.compose.foundation.clickable
@@ -11,7 +12,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -21,27 +21,26 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.urlshotener.MainViewModel
+import com.urlshotener.data.UrlShortenerViewModel
+import com.urlshotener.ui.component.CustomButton
+import com.urlshotener.ui.component.CustomTextField
 
 @ExperimentalComposeUiApi
-@Preview
+//@Preview
 @Composable
-fun SharePage() {
+fun SharePage(viewModel: UrlShortenerViewModel) {
 
     val activity = LocalContext.current as Activity
 
-    val testState = remember {
-        mutableStateOf(TextFieldValue("https://www.example.com/"))
-    }
-
     Dialog(
         onDismissRequest = { activity.finish() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
 
         val focusRequester = remember { FocusRequester() }
@@ -85,8 +84,8 @@ fun SharePage() {
                 )
 
                 CustomTextField(
-                    textFieldValue = testState.value,
-                    onValueChange = { testState.value = it },
+                    textFieldValue = viewModel.myURL.value,
+                    onValueChange = { viewModel.myURL.value = it },
                     label = { Text(text = "URL") },
                     trailingIcon = {
                         Icon(
@@ -98,7 +97,6 @@ fun SharePage() {
                                 .clickable {}
                                 .padding(8.dp)
                                 .size(24.dp)
-
                         )
                     }
                 )
@@ -106,9 +104,10 @@ fun SharePage() {
                 Spacer(modifier = Modifier.size(16.dp))
 
                 CustomTextField(
-                    textFieldValue = testState.value,
-                    onValueChange = { testState.value = it },
+                    textFieldValue = viewModel.shortURL.value,
+                    onValueChange = { viewModel.shortURL.value = it },
                     label = { Text(text = "URL") },
+                    readOnly = true,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Rounded.ContentCopy,
@@ -125,32 +124,44 @@ fun SharePage() {
 
                 Spacer(modifier = Modifier.size(16.dp))
 
-                OperationButton()
+                OperationButton(
+                    clickCancel = { activity.finish() },
+                    clickOK = {
+                        viewModel.addNewURLItem(
+                            viewModel.myURL.value.text,
+                            viewModel.shortURL.value.text,
+                            "10/10",
+                            "qwerty"
+                        )
+                    })
             }
         }
     }
 }
 
+@Preview
 @Composable
-fun OperationButton() {
+fun OperationButton(clickOK: () -> Unit = {}, clickCancel: () -> Unit = {}) {
     val focusManager = LocalFocusManager.current
     Row(modifier = Modifier.fillMaxWidth()) {
         CustomButton(
-            text = "123",
+            text = Resources.getSystem().getString(android.R.string.cancel),
             modifier = Modifier.weight(1f),
-            color = Color.DarkGray
+            color = Color.Gray,
         ) {
             focusManager.clearFocus()
+            clickCancel.invoke()
         }
 
 
         Spacer(modifier = Modifier.size(16.dp))
         CustomButton(
-            text = "456",
+            text = Resources.getSystem().getString(android.R.string.ok),
             modifier = Modifier.weight(1f),
             color = MaterialTheme.colors.primary
         ) {
             focusManager.clearFocus()
+            clickOK.invoke()
         }
     }
 }

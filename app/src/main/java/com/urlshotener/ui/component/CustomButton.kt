@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,9 +32,10 @@ fun CustomButton(modifier: Modifier, text: String, color: Color, onClick: () -> 
             text = text,
             Modifier.padding(vertical = 1.dp, horizontal = 8.dp),
             style = TextStyle(
-                fontSize = 16.sp,
-                letterSpacing = 0.sp,
-                background = Color.Transparent
+                fontWeight = FontWeight.Medium,
+                fontSize = 18.sp,
+                letterSpacing = 0.15.sp,
+//                background = Color.Transparent
             )
         )
     }
