@@ -4,12 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.view.WindowCompat
 import com.urlshotener.data.UrlShortenerViewModel
 import com.urlshotener.data.UrlShortenerViewModelFactory
 import com.urlshotener.data.URLItemRoomDataBase
+import com.urlshotener.ui.page.MainPage
 import com.urlshotener.ui.page.Test
 import com.urlshotener.ui.theme.ComposeTestTheme
 
@@ -24,6 +28,7 @@ class MainActivity : ComponentActivity() {
     }
     private val viewModel by viewModels<MainViewModel>()
 
+    @ExperimentalMaterialApi
     @ExperimentalMaterial3Api
     @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +36,9 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             ComposeTestTheme {
-                Test()
+                androidx.compose.material.Surface(color = MaterialTheme.colors.background) {
+                    MainPage()
+                }
             }
         }
     }
