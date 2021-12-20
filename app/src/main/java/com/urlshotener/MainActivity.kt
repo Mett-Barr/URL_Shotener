@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
                 .urlItemDao()
         )
     }
-    private val viewModel by viewModels<MainViewModel>()
+    private val mainViewModel by viewModels<MainViewModel>()
 
     @ExperimentalMaterialApi
     @ExperimentalMaterial3Api
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ComposeTestTheme {
                 androidx.compose.material.Surface(color = MaterialTheme.colors.background) {
-                    MainPage()
+                    MainPage(mainViewModel)
                 }
             }
         }
