@@ -41,7 +41,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.max
 import com.urlshotener.MainViewModel
+import com.urlshotener.ui.component.CustomRoundedButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -437,74 +439,92 @@ fun FAB(
         onClick = {
 //            viewModel.fabOnClick.value = true
             fabClick()
-        }
+        },
+//        backgroundColor = androidx.compose.material.MaterialTheme.colors.background
 
     ) {
         Box() {
-            androidx.compose.material.Icon(
-                imageVector = Icons.Rounded.ExpandMore, contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .size(36.dp)
-                    .padding(top = 4.dp)
-                    .alpha(alphaProportion)
-                    .clip(RoundedCornerShape(50))
-                    .clickable(enabled = alphaProportion > 0.5f) {
-                        viewModel.closeFabOnClick.value = true
-                        viewModel.onTouchEvent.value = false
-                        if (scrollState.firstVisibleItemIndex < 2) {
-                            coroutineScope.launch {
-                                // 0 is the first item index
-                                scrollState.animateScrollToItem(0, moveRange)
-                            }
-                        } else {
+            if (alphaProportion > 0f) {
+                androidx.compose.material.Icon(
+                    imageVector = Icons.Rounded.ExpandMore, contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .size(36.dp)
+                        .padding(top = 4.dp)
+                        .alpha(alphaProportion)
+                        .clip(RoundedCornerShape(50))
+                        .clickable(enabled = alphaProportion > 0.5f) {
+                            viewModel.closeFabOnClick.value = true
+                            viewModel.onTouchEvent.value = false
+                            if (scrollState.firstVisibleItemIndex < 2) {
+                                coroutineScope.launch {
+                                    // 0 is the first item index
+                                    scrollState.animateScrollToItem(0, moveRange)
+                                }
+                            } else {
 //                            viewSizeDp.heightRang.value =
-                        }
+                            }
 
-                        Log.d("!!!!!", "FAB: Icon 1")
-                    }
-            )
-            androidx.compose.material.Text(
-                text = ((viewSizeDp.heightRang - 56.dp) / (slideSize - 56.dp)).toString(),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .alpha(alphaProportion)
-                    .clickable(enabled = alphaProportion > 0.5f) {
-                        Log.d("!!!!!", "FAB: Text")
-                    }
-            )
-            androidx.compose.material.Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .alpha(alphaProportion)
-                    .clickable(enabled = alphaProportion > 0.5f) {
-                        Log.d("!!!!!", "FAB: Button")
-                    },
-            ) {
-                Text(
+                            Log.d("!!!!!", "FAB: Icon 1")
+                        }
+                )
+                androidx.compose.material.Text(
+                    text = ((viewSizeDp.heightRang - 56.dp) / (slideSize - 56.dp)).toString(),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .alpha(alphaProportion)
+                        .clickable(enabled = alphaProportion > 0.5f) {
+                            Log.d("!!!!!", "FAB: Text")
+                        }
+                )
+                CustomRoundedButton(
                     text = "Test",
-                    style = androidx.compose.material.MaterialTheme.typography.button
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(12.dp)
+                        .alpha(alphaProportion)
+                        .clickable(enabled = alphaProportion > 0.5f) {
+                            Log.d("!!!!!", "FAB: Button")
+                        }
+                ) { }
+//                androidx.compose.material.Button(
+//                    onClick = { /*TODO*/ },
+//                    modifier = Modifier
+//                        .align(Alignment.BottomEnd)
+//                        .padding(16.dp)
+//                        .alpha(alphaProportion)
+//                        .clickable(enabled = alphaProportion > 0.5f) {
+//                            Log.d("!!!!!", "FAB: Button")
+//                        },
+//                ) {
+//                    Text(
+//                        text = "Test",
+//                        style = androidx.compose.material.MaterialTheme.typography.button
+//                    )
+//                }
+
+            }
+            if (1 - (viewSizeDp.heightRang - 56.dp) / (slideSize - 56.dp) > 0f) {
+                androidx.compose.material.Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(bounded = false, radius = 300.dp),
+                            enabled = alphaProportion < 0.5f
+                        ) {
+                            fabClick()
+                            Log.d("!!!!!", "FAB: Icon 2")
+                        }
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                        .sizeIn(max(100.dp, 100.dp))
+                        .fillMaxSize()
+//                        .size(48.dp)
+                        .alpha(1 - (viewSizeDp.heightRang - 56.dp) / (slideSize - 56.dp)),
                 )
             }
-            androidx.compose.material.Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(bounded = false, radius = 300.dp),
-                        enabled = alphaProportion < 0.5f
-                    ) { fabClick()
-                        Log.d("!!!!!", "FAB: Icon 2")
-                    }
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-//                    .fillMaxSize()
-                    .size(48.dp)
-                    .alpha(1 - (viewSizeDp.heightRang - 56.dp) / (slideSize - 56.dp)),
-            )
         }
     }
 }

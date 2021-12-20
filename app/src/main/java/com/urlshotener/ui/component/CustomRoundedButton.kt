@@ -10,8 +10,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+
 @Composable
-fun CustomRoundedButton(modifier: Modifier, text: String, onClick: () -> Unit) {
+fun CustomRoundedButton(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(50),
