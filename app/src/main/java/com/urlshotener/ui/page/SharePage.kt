@@ -26,13 +26,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.urlshotener.MainViewModel
 import com.urlshotener.data.UrlShortenerViewModel
 import com.urlshotener.ui.component.CustomButton
 import com.urlshotener.ui.component.CustomTextField
 
 @ExperimentalComposeUiApi
-//@Preview
 @Composable
 fun SharePage(viewModel: UrlShortenerViewModel) {
 
@@ -43,98 +41,200 @@ fun SharePage(viewModel: UrlShortenerViewModel) {
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
 
-        val focusRequester = remember { FocusRequester() }
-        val focusManager = LocalFocusManager.current
+        ShortUrlCard(viewModel = viewModel, activity = activity)
 
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            elevation = 8.dp,
-            modifier = Modifier
-                .clickable(
-                    interactionSource = MutableInteractionSource(),
-                    indication = null
-                ) {
-                    focusManager.clearFocus()
-                    activity.window.insetsController?.hide(WindowInsets.Type.ime())
-                    Log.d("!!!", "SharePage: ")
-                }
-                .padding(36.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+//        val focusRequester = remember { FocusRequester() }
+//        val focusManager = LocalFocusManager.current
+//
+//        Card(
+//            shape = RoundedCornerShape(16.dp),
+//            elevation = 8.dp,
+//            modifier = Modifier
+//                .clickable(
+//                    interactionSource = MutableInteractionSource(),
+//                    indication = null
+//                ) {
+//                    focusManager.clearFocus()
+//                    activity.window.insetsController?.hide(WindowInsets.Type.ime())
+//                    Log.d("!!!", "SharePage: ")
+//                }
+//                .padding(36.dp)
+//        ) {
+//            Column(
+//                modifier = Modifier
+//                    .wrapContentSize()
+//                    .padding(16.dp),
+//                verticalArrangement = Arrangement.Center,
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//            ) {
+//                Text(
+//                    text = "Shorten your URL",
+//                    textAlign = TextAlign.Center,
+//                    maxLines = 4,
+//                    style = MaterialTheme.typography.h5,
+//                    modifier = Modifier
+//                        .padding(bottom = 16.dp)
+//                        .clickable(
+//                            interactionSource = MutableInteractionSource(),
+//                            indication = null
+//                        ) {
+//                            focusManager.clearFocus()
+//                            Log.d("!!!", "SharePage: ")
+//                        }
+//                )
+//
+//                CustomTextField(
+//                    textFieldValue = viewModel.myURL.value,
+//                    onValueChange = { viewModel.myURL.value = it },
+//                    label = { Text(text = "URL") },
+//                    trailingIcon = {
+//                        Icon(
+//                            imageVector = Icons.Rounded.ContentCopy,
+//                            contentDescription = "Copy",
+//                            modifier = Modifier
+//                                .padding(4.dp)
+//                                .clip(RoundedCornerShape(50))
+//                                .clickable {}
+//                                .padding(8.dp)
+//                                .size(24.dp)
+//                        )
+//                    }
+//                )
+//
+//                Spacer(modifier = Modifier.size(16.dp))
+//
+//                CustomTextField(
+//                    textFieldValue = viewModel.shortURL.value,
+//                    onValueChange = { viewModel.shortURL.value = it },
+//                    label = { Text(text = "URL") },
+//                    readOnly = true,
+//                    trailingIcon = {
+//                        Icon(
+//                            imageVector = Icons.Rounded.ContentCopy,
+//                            contentDescription = "Copy",
+//                            modifier = Modifier
+//                                .padding(4.dp)
+//                                .clip(RoundedCornerShape(50))
+//                                .clickable {}
+//                                .padding(8.dp)
+//                                .size(24.dp)
+//                        )
+//                    }
+//                )
+//
+//                Spacer(modifier = Modifier.size(16.dp))
+//
+//                OperationButton(
+//                    clickCancel = { activity.finish() },
+//                    clickOK = {
+//                        viewModel.addNewURLItem(
+//                            viewModel.myURL.value.text,
+//                            viewModel.shortURL.value.text,
+//                            "10/10",
+//                            "qwerty"
+//                        )
+//                    })
+//            }
+//        }
+    }
+}
+
+@Composable
+fun ShortUrlCard(viewModel: UrlShortenerViewModel, activity: Activity) {
+
+//    val activity = LocalContext.current as Activity
+
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        elevation = 8.dp,
+        modifier = Modifier
+            .clickable(
+                interactionSource = MutableInteractionSource(),
+                indication = null
             ) {
-                Text(
-                    text = "Shorten your URL",
-                    textAlign = TextAlign.Center,
-                    maxLines = 4,
-                    style = MaterialTheme.typography.h5,
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .clickable(
-                            interactionSource = MutableInteractionSource(),
-                            indication = null
-                        ) {
-                            focusManager.clearFocus()
-                            Log.d("!!!", "SharePage: ")
-                        }
-                )
-
-                CustomTextField(
-                    textFieldValue = viewModel.myURL.value,
-                    onValueChange = { viewModel.myURL.value = it },
-                    label = { Text(text = "URL") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.ContentCopy,
-                            contentDescription = "Copy",
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .clip(RoundedCornerShape(50))
-                                .clickable {}
-                                .padding(8.dp)
-                                .size(24.dp)
-                        )
-                    }
-                )
-
-                Spacer(modifier = Modifier.size(16.dp))
-
-                CustomTextField(
-                    textFieldValue = viewModel.shortURL.value,
-                    onValueChange = { viewModel.shortURL.value = it },
-                    label = { Text(text = "URL") },
-                    readOnly = true,
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.ContentCopy,
-                            contentDescription = "Copy",
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .clip(RoundedCornerShape(50))
-                                .clickable {}
-                                .padding(8.dp)
-                                .size(24.dp)
-                        )
-                    }
-                )
-
-                Spacer(modifier = Modifier.size(16.dp))
-
-                OperationButton(
-                    clickCancel = { activity.finish() },
-                    clickOK = {
-                        viewModel.addNewURLItem(
-                            viewModel.myURL.value.text,
-                            viewModel.shortURL.value.text,
-                            "10/10",
-                            "qwerty"
-                        )
-                    })
+                focusManager.clearFocus()
+                activity.window.insetsController?.hide(WindowInsets.Type.ime())
+                Log.d("!!!", "SharePage: ")
             }
+            .padding(36.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Shorten your URL",
+                textAlign = TextAlign.Center,
+                maxLines = 4,
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .clickable(
+                        interactionSource = MutableInteractionSource(),
+                        indication = null
+                    ) {
+                        focusManager.clearFocus()
+                        Log.d("!!!", "SharePage: ")
+                    }
+            )
+
+            CustomTextField(
+                textFieldValue = viewModel.myURL.value,
+                onValueChange = { viewModel.myURL.value = it },
+                label = { Text(text = "URL") },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.ContentCopy,
+                        contentDescription = "Copy",
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(50))
+                            .clickable {}
+                            .padding(8.dp)
+                            .size(24.dp)
+                    )
+                }
+            )
+
+            Spacer(modifier = Modifier.size(16.dp))
+
+            CustomTextField(
+                textFieldValue = viewModel.shortURL.value,
+                onValueChange = { viewModel.shortURL.value = it },
+                label = { Text(text = "URL") },
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.ContentCopy,
+                        contentDescription = "Copy",
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(50))
+                            .clickable {}
+                            .padding(8.dp)
+                            .size(24.dp)
+                    )
+                }
+            )
+
+            Spacer(modifier = Modifier.size(16.dp))
+
+            OperationButton(
+                clickCancel = { activity.finish() },
+                clickOK = {
+                    viewModel.addNewURLItem(
+                        viewModel.myURL.value.text,
+                        viewModel.shortURL.value.text,
+                        "10/10",
+                        "qwerty"
+                    )
+                })
         }
     }
 }

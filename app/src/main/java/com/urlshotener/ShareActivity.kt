@@ -1,5 +1,6 @@
 package com.urlshotener
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import com.urlshotener.MainViewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.urlshotener.data.URLItemRoomDataBase
 import com.urlshotener.data.UrlShortenerViewModel
 import com.urlshotener.data.UrlShortenerViewModelFactory
@@ -41,7 +44,17 @@ class ShareActivity : ComponentActivity() {
 //            }
 
             ComposeTestTheme {
-                SharePage(viewModel)
+
+//                val activity = LocalContext.current as Activity
+
+                SharePage(viewModel = viewModel)
+
+//                Dialog(
+//                    onDismissRequest = { activity.finish() },
+//                    properties = DialogProperties(usePlatformDefaultWidth = false),
+//                ) {
+//                    SharePage(viewModel)
+//                }
 //                Test()
             }
         }
