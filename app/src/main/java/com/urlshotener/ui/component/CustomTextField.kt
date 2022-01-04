@@ -1,17 +1,25 @@
 package com.urlshotener.ui.component
 
+import android.graphics.Typeface
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.urlshotener.data.TEST_URL
+import com.urlshotener.ui.theme.AppTypography
 import com.urlshotener.ui.theme.URLTypography
 
 @Composable
@@ -47,6 +55,22 @@ fun CustomTextField(
                 unfocusedIndicatorColor = Color.Transparent
             ),
         )
+    }
+}
+
+@Preview
+@Composable
+fun CustomText(
+//    modifier: Modifier = Modifier,
+//    text: String
+) {
+    Column {
+        CompositionLocalProvider(LocalContentAlpha provides  ContentAlpha.medium) {
+            Text(text = "URL",
+            style = AppTypography.labelSmall,
+            )
+        }
+        Text(text = TEST_URL, style = URLTypography)
     }
 }
 

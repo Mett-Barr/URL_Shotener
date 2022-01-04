@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
 
 //    private val viewModel by viewModels<UrlShortenerViewModel>()
 
+    @ExperimentalAnimationApi
     @InternalCoroutinesApi
     @ExperimentalMaterialApi
     @ExperimentalMaterial3Api

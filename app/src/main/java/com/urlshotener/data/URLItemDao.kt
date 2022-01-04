@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface URLItemDao {
-    @Query("SELECT * from URLItem")
+    @Query("SELECT * from URLItem ORDER BY id DESC")
     fun getAll(): Flow<List<URLItem>>
 
     @Query("SELECT * from URLItem WHERE id=:id")

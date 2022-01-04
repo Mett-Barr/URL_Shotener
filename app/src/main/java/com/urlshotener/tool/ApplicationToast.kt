@@ -1,6 +1,7 @@
-package com.urlshotener
+package com.urlshotener.tool
 
 import android.content.Context
+import android.view.Gravity
 import android.widget.Toast
 
 object ApplicationToast {
@@ -12,6 +13,7 @@ object ApplicationToast {
             toast.cancel()
         }
         toast = Toast.makeText(context, str, Toast.LENGTH_SHORT)
+//        toast.setGravity(Gravity.CENTER,0 ,0)
         toast.show()
     }
 

@@ -1,12 +1,10 @@
 package com.urlshotener.ui.page
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import android.view.WindowInsets
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,15 +12,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.*
 import androidx.compose.material.FabPosition
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.*
+//import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -30,14 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.urlshotener.BASE_URL
-import com.urlshotener.TEST_URL
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
@@ -47,32 +45,36 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.max
-import com.google.accompanist.insets.systemBarsPadding
-import com.urlshotener.ApplicationToast
 import com.urlshotener.data.URLItem
 import com.urlshotener.data.UrlShortenerViewModel
 import com.urlshotener.ui.component.CustomTextField
+import com.urlshotener.ui.component.URLItemCard
+import com.urlshotener.ui.component.URLItemCardFirst
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
 
 var slideSize = 252.dp
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
-@ExperimentalMaterial3Api
-//@Preview
+//@ExperimentalMaterial3Api
 @Composable
 fun MainPage(viewModel: UrlShortenerViewModel) {
+
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // We save the scrolling position with this state that can also
     // be used to programmatically scroll the list
     val scrollState = rememberLazyListState()
 
-    val coroutineScope = rememberCoroutineScope()
 
     val stateCheck by remember {
         derivedStateOf {
@@ -91,11 +93,6 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
         mutableStateOf(0)
     }
 
-    var paddingSize = 568
-
-    var context: Context
-
-
     val configuration = LocalConfiguration.current
 
     val screenHeight = configuration.screenHeightDp.dp
@@ -108,7 +105,6 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
 
     ProvideWindowInsets {
         val moveRange = thisPx(dp = slideSize + 16.dp)
-        val testPadding = thisPx(dp = 8.dp)
 
         androidx.compose.material.Scaffold(
             Modifier
@@ -142,11 +138,18 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
 //                    Log.d("!!!", "MainPage: viewSizeInt")
                 },
 
+//            topBar = {
+//                TopAppBar(modifier = Modifier.clickable {
+//                    coroutineScope.launch {
+//                        scaffoldState.snackbarHostState.showSnackbar(message = "!!!", actionLabel = "Redo")
+//                        Log.d("!!!", "MainPage: TopAppBar")
+//                    }
+//                }) {
+//                }
+//            },
 
             floatingActionButton = {
-//                Log.d("!!!", "MainPage: viewSizeDp")
                 FAB(
-//                    viewSizeDp = thisDp(px = viewSizeInt.value) - 32.dp
                     viewSizeDp = fabAnimation(
                         slideRange = thisDp(px = stateCheck),
                         widthRange = thisDp(px = viewSizeInt.value),
@@ -168,16 +171,11 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
 
                         viewModel = viewModel
                     ),
-//                    modifier = Modifier.clickable {
-//                        coroutineScope.launch {
-//                            // 0 is the first item index
-//                            scrollState.animateScrollToItem(0)
-//                        }
-//                    },
                     onClick = {
                         coroutineScope.launch {
                             // 0 is the first item index
                             scrollState.animateScrollToItem(0)
+//                            scaffoldState.snackbarHostState.showSnackbar(message = "Snackbar")
                         }
                     },
                     scrollState = scrollState,
@@ -185,21 +183,12 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
                     coroutineScope = coroutineScope
                 )
 
-//                FAB()
             },
             floatingActionButtonPosition = FabPosition.End,
 
-
-//            topBar = {
-//                androidx.compose.material.Text(
-//                    //滑多少PX
-//                    text = stateCheck.toString() + "\n"
-//                            //滑多少DP
-//                            + thisDp(px = stateCheck).toString() + "\n"
-//                            //滑到第幾個
-//                            + scrollState.firstVisibleItemIndex.toString(),
-//                    modifier = Modifier.padding(top = 50.dp)
-//                )
+            scaffoldState = scaffoldState,
+//            snackbarHost = {
+//                scaffoldState.snackbarHostState
 //            }
 
         ) {
@@ -212,10 +201,7 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
                 state = scrollState,
                 reverseLayout = true,
                 modifier = Modifier
-//                    .heightIn(min = screenHeight + slideSize + 16.dp)
                     .fillMaxSize()
-//                    .defaultMinSize(minHeight = screenHeight + slideSize + 16.dp)
-//                    .height(1000.dp)
                     .onGloballyPositioned { layoutCoordinates ->
                         layoutCoordinates.size.width
                     }
@@ -226,12 +212,12 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
                                 val dragEvent = event.changes.firstOrNull()
                                 when {
                                     dragEvent!!.positionChangeConsumed() -> {
-                                        Log.d("!!!", "dragEvent: changedToDownIgnoreConsumed")
+//                                        Log.d("!!!", "dragEvent: changedToDownIgnoreConsumed")
                                         return@awaitPointerEventScope
                                     }
 
                                     dragEvent.changedToDownIgnoreConsumed() -> {
-                                        Log.d("!!!", "dragEvent: changedToDownIgnoreConsumed")
+//                                        Log.d("!!!", "dragEvent: changedToDownIgnoreConsumed")
 
                                         viewModel.onTouchEvent.value = false
                                         viewModel.closeFabOnClick.value = false
@@ -241,7 +227,7 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
                                     }
 
                                     dragEvent.changedToUpIgnoreConsumed() -> {
-                                        Log.d("!!!", "dragEvent: changedToUpIgnoreConsumed")
+//                                        Log.d("!!!", "dragEvent: changedToUpIgnoreConsumed")
                                         viewModel.onTouchEvent.value = true
                                     }
                                 }
@@ -249,163 +235,62 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
                         }
                     }) {
 
-//                item {
-//                    Test2(modifier = Modifier.alpha(0f))
-//                }
+                item {
+                    Spacer(modifier = Modifier.height(slideSize + 16.dp))
+                }
 
-//                items(viewModel.getItemsSize()) { index ->
-//                    if (index == 0) {
-//                        Test(modifier = Modifier.padding(bottom = slideSize + 16.dp))
-//                    } else Test()
-//
-//                }
-
-//                items(viewModel.allUrlItems)
-
-//                val list by viewModel.allUrlItems.collectAsState(initial = emptyList())
-
-//                coroutineScope.launch {
-//                    viewModel.allUrlItems.collect() {
-//                        Log.d("!!!", it.size.toString())
-//                        items(it) { index ->
-//                            if (index.id == 0) {
-//                                Test(modifier = Modifier.padding(bottom = slideSize + 16.dp))
-//                            } else Test()
-//
-//                        }
-//                    }
-//                }
-
-                items(list) { item ->
-//                    AnimatedContent(targetState = list) {
-//
-//                    }
-                    if (item == list.first()) {
-//                        Test(modifier = Modifier.padding(bottom = slideSize + 16.dp))
-                        ContentCard3(urlItem = item, viewModel = viewModel)
-                    } else ContentCard2(urlItem = item, viewModel = viewModel)
+                items(list) { urlItem ->
+//                    if (urlItem == list.first()) URLItemCardFirst(urlItem, viewModel)
+//                    else URLItemCard(urlItem, viewModel)
+                    URLItemCard(urlItem = urlItem, viewModel = viewModel)
                 }
 
                 if (list.isNotEmpty()) {
-//                    val spacerHeight = screenHeight -
                     item {
+                        val listSize by remember {
+                            derivedStateOf { list.size }
+                        }
+
                         val spacerHeight =
-                            screenHeight - thisDp(px = 1133 + (list.size - 1) * 430) + slideSize
-                        Log.d("!!!", screenHeight.toString())
-                        if (spacerHeight > 0.dp) Spacer(modifier = Modifier.height(spacerHeight))
+                            screenHeight - thisDp(px = 1133 + (listSize - 1) * 430) + slideSize
+
+                        val spacerHeight2: Dp by animateDpAsState(screenHeight - thisDp(px = 1133 + (listSize - 1) * 430) + slideSize)
+//                        screenHeight - thisDp(px = 1133 + (listSize - 1) * 430) + slideSize
+
+                        if (spacerHeight > 0.dp) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .size(spacerHeight2)
+//                                    .animateContentSize()
+                                    .background(Color.Gray)
+                            )
+                        }
                     }
                 }
 
-//                itemsIndexed(
-//                    items = list,
-//                    itemContent = { index, item ->
-//                        AnimatedVisibility(
-//                            visible =
-//                        ) {
-//
-//                        }
-//                    }
-//                )
-
                 if (scrollState.isScrollInProgress) viewModel.fabOnClick.value = false
-
-//                if (scrollState.firstVisibleItemIndex == 0 && )
             }
 
+
+//            SnackbarHost(hostState = scaffoldState.snackbarHostState, snackbar = {
+//                Snackbar(action = {}) {
+//                    Text(text = "SnackBar")
+//                }
+//            })
         }
     }
 }
 
 @Composable
-fun test(viewModel: UrlShortenerViewModel): List<URLItem> {
-    val list by viewModel.allUrlItems.collectAsState(initial = emptyList())
-    return list
-}
-
-//@Preview
-@Composable
-fun ContentCard(
-    originURL: String,
-    shortURL: String,
-    description: String,
-    date: String,
-    modifier: Modifier = Modifier
+fun URLItemCard(
+    urlItem: URLItem,
+    viewModel: UrlShortenerViewModel
 ) {
-    Card(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .then(modifier),
-        shape = RoundedCornerShape(16.dp),
-        elevation = 8.dp,
 
-        ) {
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            androidx.compose.material.Text(text = originURL)
-            Spacer(modifier = Modifier.size(16.dp))
-            androidx.compose.material.Text(text = shortURL)
-            Spacer(modifier = Modifier.size(16.dp))
-
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                val (dateRef, descriptionRef, buttonCopyRef, buttonDeleteRef) = createRefs()
-
-                androidx.compose.material.Text(
-                    text = date,
-                    modifier = Modifier.constrainAs(dateRef) {
-                        start.linkTo(parent.start)
-                        bottom.linkTo(parent.bottom)
-                    }
-                )
-                androidx.compose.material.Text(
-                    text = description,
-                    modifier = Modifier.constrainAs(descriptionRef) {
-                        start.linkTo(dateRef.end, margin = 16.dp)
-                        bottom.linkTo(parent.bottom)
-                    }
-                )
-                Icon(imageVector = Icons.Rounded.Delete,
-                    contentDescription = "Delete",
-                    modifier = Modifier
-                        .constrainAs(buttonDeleteRef) {
-
-                            end.linkTo(buttonCopyRef.start, margin = 16.dp)
-                            centerVerticallyTo(parent)
-                        }
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable { }
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(10.dp)
-                )
-
-                Icon(
-                    imageVector = Icons.Rounded.ContentCopy,
-                    contentDescription = "Content Copy",
-                    modifier = Modifier
-                        .constrainAs(buttonCopyRef) {
-                            end.linkTo(parent.end)
-                            centerVerticallyTo(parent)
-                        }
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable { }
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(10.dp)
-                )
-            }
-        }
-    }
 }
+
+class PP(override val values: Sequence<URLItem>) : PreviewParameterProvider<URLItem>
 
 
 @Composable
@@ -602,82 +487,9 @@ fun ContentCard3(
     }
 }
 
-
-//@Preview
-@Composable
-fun Test(modifier: Modifier = Modifier) {
-//    Box(modifier = Modifier.fillMaxSize(),
-//    contentAlignment = Alignment.Center)
-
-//    Dialog(onDismissRequest = { /*TODO*/ }) {
-    ContentCard(
-        modifier = modifier,
-        originURL = BASE_URL,
-        shortURL = TEST_URL,
-        description = "QWERTY",
-        date = "10/10",
-    )
-//    }
-}
-
-//@Preview
-@Composable
-fun Test2(modifier: Modifier = Modifier) {
-//    Box(modifier = Modifier.fillMaxSize(),
-//    contentAlignment = Alignment.Center)
-
-//    Dialog(onDismissRequest = { /*TODO*/ }) {
-    ContentCard(
-        originURL = BASE_URL,
-        shortURL = TEST_URL,
-        description = "QWERTY",
-        date = "!!!!!!!!!!!!!!!!!",
-        modifier = modifier
-    )
-//    }
-}
-
-//@Preview
-//@Composable
-//fun FAB() {
-//
-//    Card(
-//        modifier = Modifier
-//            .padding(start = 32.dp, bottom = 8.dp)
-//            .fillMaxWidth()
-//            .height(200.dp),
-//        shape = RoundedCornerShape(16.dp),
-//        elevation = 16.dp
-//    ) {
-//        Box() {
-//            Icon(
-//                imageVector = Icons.Rounded.ExpandMore, contentDescription = null,
-//                modifier = Modifier.align(Alignment.TopCenter).size(36.dp).padding(top = 8.dp)
-//            )
-//            androidx.compose.material.Text(
-//                text = TEST_URL,
-//                modifier = Modifier.align(Alignment.Center)
-//            )
-//            Icon(
-//                imageVector = Icons.Rounded.Add,
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .align(Alignment.Center)
-//                    .size(24.dp)
-//                    .alpha(0f),
-//            )
-//        }
-//    }
-//}
-
 @ExperimentalMaterialApi
 @Composable
 fun FAB(
-    modifier: Modifier = Modifier,
-    originURL: String = BASE_URL,
-    shortURL: String = TEST_URL,
-    description: String = "QWERTY",
-    date: String = "!!!!!!!!!!!!!!!!!",
     viewSizeDp: SizeProportion = SizeProportion(200.dp, 0.dp),
     scrollState: LazyListState,
     viewModel: UrlShortenerViewModel,
@@ -687,7 +499,6 @@ fun FAB(
 
     val fabCornerShape: Dp by animateDpAsState(targetValue = viewModel.fabRoundedCornerShape.value)
 
-//    val fabSize: Dp by animateDpAsState(targetValue = if (clickState.value) viewSizeDp else 56.dp)
     val fabHeight: Dp by animateDpAsState(targetValue = viewSizeDp.heightRang)
     val fabWidth: Dp by animateDpAsState(targetValue = viewSizeDp.widthRange)
 
@@ -698,8 +509,6 @@ fun FAB(
     val moveRange = thisPx(dp = slideSize + 16.dp)
 
     fun fabClick() {
-//            alpha.value = Modifier.alpha(0f)
-//            clickState.value = !clickState.value
         if (scrollState.firstVisibleItemIndex < 2) {
             onClick.invoke()
         }
@@ -710,8 +519,6 @@ fun FAB(
         viewModel.closeFabOnClick.value = false
         viewModel.fabOnClick.value = true
         viewModel.onTouchEvent.value = false
-
-        Log.d("!!!", "fabClick: ")
     }
 
     Card(
@@ -719,17 +526,15 @@ fun FAB(
             .padding(start = 32.dp, bottom = 8.dp)
             .size(height = fabHeight, width = fabWidth),
         shape = RoundedCornerShape(fabCornerShape),
-//        shape = RoundedCornerShape(16.dp),
         elevation = 16.dp,
         onClick = {
 //            viewModel.fabOnClick.value = true
             fabClick()
-            Log.d("!!!", "FAB: fabClick")
         },
-//        backgroundColor = androidx.compose.material.MaterialTheme.colors.background
 
-    ) {
+        ) {
 
+        // Expanded state
         Box(modifier = Modifier.alpha(alphaProportion)) {
             if (alphaProportion > 0f) {
                 ShortUrlFab(
@@ -742,6 +547,7 @@ fun FAB(
             }
         }
 
+        // Closed state
         Box {
             if (1 - alphaProportion > 0f) {
                 androidx.compose.material.Icon(
@@ -773,7 +579,6 @@ fun FAB(
 @Composable
 fun fabAnimation(
     slideRange: Dp,
-    heightRang: Dp = 0.dp,
     widthRange: Dp,
     itemIndex: Int,
     fabOnClick: Boolean,
@@ -799,14 +604,12 @@ fun fabAnimation(
     if (fabOnClick && !viewModel.closeFabOnClick.value) {
         height = slideSize
         width = widthRange
-        Log.d("!!!!!!", "fabAnimation: ")
     }
 
     // 自動歸位
     if (scrollState.firstVisibleItemIndex == 0 && viewModel.onTouchEvent.value && slideRange <= slideSize / 2) {
 //        Log.d("!!!", "slideProportion: ${viewModel.onTouchEvent.value}")
         slideToBottom.invoke()
-        Log.d("!!!", "fabAnimation: ")
     } else if (scrollState.firstVisibleItemIndex == 0 && viewModel.onTouchEvent.value && slideRange <= slideSize) {
 //        Log.d("!!!", "slideProportion: ${viewModel.onTouchEvent.value}")
         slideToNoPadding.invoke()
@@ -819,8 +622,7 @@ fun fabAnimation(
         Log.d("!!!!", "height $height   width $width")
     }
 
-    viewModel.fabRoundedCornerShape.value =
-        (16 + 40 * slideRange.value.toInt() / slideSize.value.toInt()).dp
+    viewModel.fabRoundedCornerShape.value = (16 + 40 * (1 - height.value / slideSize.value)).dp
 
     return SizeProportion(height, width)
 }
@@ -833,7 +635,6 @@ fun ShortUrlFab(
     coroutineScope: CoroutineScope,
     moveRange: Int
 ) {
-
 //    val activity = LocalContext.current as Activity
 
     val focusRequester = remember { FocusRequester() }
@@ -856,7 +657,6 @@ fun ShortUrlFab(
             }
             .onGloballyPositioned {
                 text.value = it.size.height.toString()
-//                slideSize = (it.size.height).dp + 32.dp
             },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -896,27 +696,6 @@ fun ShortUrlFab(
             modifier = Modifier.height(100.dp)
         )
 
-//        Spacer(modifier = Modifier.size(16.dp))
-//
-//        CustomTextField(
-//            textFieldValue = viewModel.shortURL.value,
-//            onValueChange = { viewModel.shortURL.value = it },
-//            label = { androidx.compose.material.Text(text = "URL") },
-//            readOnly = true,
-//            trailingIcon = {
-//                androidx.compose.material.Icon(
-//                    imageVector = Icons.Rounded.ContentCopy,
-//                    contentDescription = "Copy",
-//                    modifier = Modifier
-//                        .padding(4.dp)
-//                        .clip(RoundedCornerShape(50))
-//                        .clickable {}
-//                        .padding(8.dp)
-//                        .size(24.dp)
-//                )
-//            }
-//        )
-
         Spacer(modifier = Modifier.size(16.dp))
 
         OperationButton(
@@ -934,28 +713,6 @@ fun ShortUrlFab(
 
             },
             clickOK = {
-//                viewModel.addNewURLItem(
-//                    viewModel.myURL.value.text,
-//                    viewModel.shortURL.value.text,
-//                    "10/10",
-//                    "qwerty"
-//                )
-//                Log.d("!!!", viewModel.getItemsSize().toString())
-//                viewModel.getItemsSize()
-//                viewModel.deleteURLItem(
-//                    viewModel.myURL.value.text,
-//                    viewModel.shortURL.value.text,
-//                    "10/10",
-//                    "qwerty"
-//                )
-
-//                viewModel.deleteById()
-
-//                viewModel.justDelete()
-                Log.d("!!!", "ShortUrlFab: ")
-//                val urlItem = viewModel.allUrlItems.collect()
-//                viewModel.deleteById()
-
                 viewModel.addNewURLItem(
                     viewModel.myURL.value.text,
                     viewModel.shortURL.value.text,
@@ -963,12 +720,6 @@ fun ShortUrlFab(
                     "qwerty"
                 )
             })
-
-//        val fabHeight = remember {
-//            mutableStateOf(470)
-//        }
-
-//        viewModel.fabHeight.value = thisDp(fabHeight.value)
     }
 }
 

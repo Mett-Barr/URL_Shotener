@@ -2,16 +2,15 @@ package com.urlshotener.data
 
 import android.util.Log
 import android.webkit.URLUtil
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.urlshotener.TEST_URL
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -87,6 +86,12 @@ class UrlShortenerViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         return !(originURL.isBlank() || shortURL.isBlank() || date.isBlank() || description.isBlank())
     }
 
+
+
+
+    /**---------------------      Update         ------------------------------------*/
+
+
     private fun insertURLItem(urlItem: URLItem) {
         viewModelScope.launch {
             urlItemDao.insert(urlItem)
@@ -103,7 +108,7 @@ class UrlShortenerViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
             originURL = originURL,
             shortURL = shortURL,
             date = date,
-            description = description
+            title = description
         )
     }
 
@@ -118,18 +123,31 @@ class UrlShortenerViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
     }
 
 
-    private fun deleteURLItem(urlItem: URLItem) {
-        Log.d("!!!", "deleteURLItem: ")
+/**---------------------      Update         ------------------------------------*/
+
+    private fun updateURLItem(urlItem: URLItem) {
         viewModelScope.launch {
-//            urlItemDao.delete(urlItem)
-            allUrlItems.collect() {
-                try {
-                    urlItemDao.delete(it.first())
-                } catch (ex: NoSuchElementException) {
-                    Log.d("!!!", "deleteURLItem: ")
-                }
-            }
+            urlItemDao.update(urlItem)
         }
+    }
+
+    fun update(urlItem: URLItem) {
+        updateURLItem(urlItem)
+    }
+
+
+/**---------------------      Delete         ------------------------------------*/
+
+    private fun deleteURLItem(urlItem: URLItem) {
+        viewModelScope.launch() {
+//            delay(500)
+            urlItemDao.delete(urlItem)
+        Log.d("!!!", "deleteURLItem: ${urlItem.id}")
+        }
+    }
+
+    fun delete(urlItem: URLItem) {
+        deleteURLItem(urlItem)
     }
 
     private fun justDeleteItem() {
@@ -152,7 +170,7 @@ class UrlShortenerViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
             originURL = originURL,
             shortURL = shortURL,
             date = date,
-            description = description
+            title = description
         )
     }
 

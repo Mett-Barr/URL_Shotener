@@ -15,5 +15,5 @@ data class URLItem(
     @ColumnInfo(name = "date")
     val date: String,
     @ColumnInfo(name = "description")
-    val description: String
+    var title: String
 )
