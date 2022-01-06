@@ -1,5 +1,7 @@
 package com.urlshotener.ui.theme
 
+import android.graphics.Color
+import android.view.Surface
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -68,13 +70,13 @@ private val DarkThemeColors = darkColorScheme(
 private val DarkColorPalette = darkColors(
     primary = Purple200,
     primaryVariant = Purple700,
-    secondary = Teal200
+    secondary = Teal200,
 )
 
 private val LightColorPalette = lightColors(
     primary = Purple500,
     primaryVariant = Purple700,
-    secondary = Teal200
+    secondary = Teal200,
 
     /* Other default colors to override
     background = Color.White,
@@ -89,7 +91,7 @@ private val LightColorPalette = lightColors(
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable() () -> Unit,
 ) {
     val colors = if (!useDarkTheme) {
         LightThemeColors
@@ -107,7 +109,7 @@ fun AppTheme(
 @Composable
 fun ComposeTestTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable() () -> Unit,
 ) {
     val colors = if (darkTheme) {
         DarkColorPalette
@@ -121,4 +123,15 @@ fun ComposeTestTheme(
         shapes = Shapes,
         content = content
     )
+}
+
+@Composable
+fun surfaceBackgroundColor(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+): androidx.compose.ui.graphics.Color {
+    return if (darkTheme) {
+        DarkBackground
+    } else {
+        LightBackground
+    }
 }

@@ -1,10 +1,13 @@
-package com.urlshotener
+package com.urlshotener.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.ui.ExperimentalComposeUiApi
+import com.urlshotener.MainViewModel
+import com.urlshotener.UrlShortenerApplication
+import com.urlshotener.UrlShortenerViewModelFactory
 import com.urlshotener.ui.page.SharePage
 import com.urlshotener.ui.theme.ComposeTestTheme
 

@@ -141,3 +141,10 @@ val URLTypography = TextStyle(
 	fontSize = 18.sp,
 	letterSpacing = 0.15.sp
 )
+
+val UrlLabel = TextStyle(
+	fontWeight = FontWeight.Normal,
+	fontSize = 11.sp,
+	lineHeight = 16.sp,
+	letterSpacing = 0.5.sp,
+)

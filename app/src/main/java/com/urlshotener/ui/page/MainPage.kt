@@ -80,9 +80,19 @@ fun MainPage(viewModel: MainViewModel) {
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
+    val deleteSnackbar = { it: String, redo: () -> Unit ->
+        coroutineScope.launch {
+            scaffoldState.snackbarHostState.showSnackbar(message = it + "已刪除", actionLabel = "復原").let {
+                when (it) {
+                    SnackbarResult.ActionPerformed -> redo.invoke()
+                }
+            }
+        }
+    }
+
 
     /**     Data     */
-    val list by viewModel.allUrlItems.collectAsState(initial = emptyList())
+    val list by viewModel.savedUrlItems.collectAsState(initial = emptyList())
 
 
     ProvideWindowInsets {
@@ -224,14 +234,23 @@ fun MainPage(viewModel: MainViewModel) {
                 items(list) { urlItem ->
 //                    if (urlItem == list.first()) URLItemCardFirst(urlItem, viewModel)
 //                    else URLItemCard(urlItem, viewModel)
-                    URLItemCard(urlItem = urlItem, viewModel = viewModel)
+                    URLItemCard(urlItem = urlItem, viewModel = viewModel,
+                        snackbar = deleteSnackbar
+//                        {
+////                            coroutineScope.launch {
+////                                scaffoldState.snackbarHostState.showSnackbar(urlItem.title + "已刪除", "復原")
+////                            }
+//
+//                            delete(String())
+//                        }
+                    )
                 }
 
                 if (list.isNotEmpty()) {
                     item {
                         val listSize by viewModel.listSize.collectAsState(initial = 0)
 
-                        val high: Dp by animateDpAsState(screenHeight - thisDp(px = listSize * 658))
+                        val high: Dp by animateDpAsState(screenHeight - thisDp(px = listSize * 670))
 
                         if (high > 0.dp) Spacer(modifier = Modifier.height(high))
                     }

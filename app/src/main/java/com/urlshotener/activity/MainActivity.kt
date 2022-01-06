@@ -1,4 +1,4 @@
-package com.urlshotener
+package com.urlshotener.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +10,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.view.WindowCompat
+import com.urlshotener.MainViewModel
+import com.urlshotener.UrlShortenerApplication
+import com.urlshotener.UrlShortenerViewModelFactory
 import com.urlshotener.ui.page.MainPage
 import com.urlshotener.ui.theme.ComposeTestTheme
 import kotlinx.coroutines.InternalCoroutinesApi

@@ -6,8 +6,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface URLItemDao {
 
-    @Query("SELECT * from URLItem ORDER BY id DESC")
-    fun getAll(): Flow<List<URLItem>>
+//    @Query("SELECT * from URLItem ORDER BY id DESC")
+//    fun getAll(): Flow<List<URLItem>>
+
+    @Query("SELECT * from URLItem WHERE deleted=:deleteState ORDER BY id DESC")
+    fun getAllByDeleteState(deleteState: Int): Flow<List<URLItem>>
 
     @Query("SELECT COUNT(*) from URLItem")
     fun getSize(): Flow<Int>

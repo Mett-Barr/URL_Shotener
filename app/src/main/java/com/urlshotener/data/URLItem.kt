@@ -8,12 +8,19 @@ import androidx.room.PrimaryKey
 data class URLItem(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+
     @ColumnInfo(name = "origin URL")
     val originURL: String,
+
     @ColumnInfo(name = "short URL")
     val shortURL: String,
+
     @ColumnInfo(name = "date")
     val date: String,
+
     @ColumnInfo(name = "description")
-    var title: String
+    var title: String,
+
+    @ColumnInfo(name = "deleted")
+    var deleted: Int = 0
 )

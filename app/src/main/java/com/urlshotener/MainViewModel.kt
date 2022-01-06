@@ -49,7 +49,6 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
 
 
 
-
     /**----------------------------------      NetWork      --------------------------------------*/
 
     fun shortUrl(context: Context) {
@@ -67,7 +66,7 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
 
     /**----------------------------------         DataBase        --------------------------------*/
 
-    val allUrlItems: Flow<List<URLItem>> = urlItemDao.getAll()
+    val savedUrlItems: Flow<List<URLItem>> = urlItemDao.getAllByDeleteState(0)
 
     val listSize: Flow<Int> = urlItemDao.getSize()
 
@@ -76,7 +75,7 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
     private fun getItemsSize(): Int {
         var size = 0
         viewModelScope.launch {
-            allUrlItems.collect {
+            savedUrlItems.collect {
                 itemsSize.value = it.size
                 Log.d("!!!", it.size.toString())
             }
@@ -99,10 +98,20 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         return !(originURL.isBlank() || shortURL.isBlank() || date.isBlank() || description.isBlank())
     }
 
+    fun reversDeleteState(urlItem: URLItem): URLItem {
+        if (urlItem.deleted == 0) {
+            urlItem.deleted = 1
+        } else {
+            urlItem.deleted = 0
+        }
+
+        return urlItem
+    }
 
 
 
-    /**---------------------      Update         ------------------------------------*/
+
+    /**---------------------      Insert         ------------------------------------*/
 
 
     private fun insertURLItem(urlItem: URLItem) {
@@ -147,6 +156,12 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
     fun update(urlItem: URLItem) {
         updateURLItem(urlItem)
     }
+
+    fun updateDeleteState(urlItem: URLItem, deleteState: Int) {
+        urlItem.deleted = deleteState
+        updateURLItem(urlItem)
+    }
+
 
 
 /**---------------------      Delete         ------------------------------------*/

@@ -1,23 +1,31 @@
 package com.urlshotener.ui.component
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.urlshotener.TEST_URL
 import com.urlshotener.ui.theme.AppTypography
 import com.urlshotener.ui.theme.URLTypography
+import com.urlshotener.ui.theme.UrlLabel
+import com.urlshotener.ui.theme.surfaceBackgroundColor
 
 @Composable
 fun CustomTextField(
@@ -28,7 +36,8 @@ fun CustomTextField(
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    isError: Boolean = false
+    isError: Boolean = false,
+    singleLine: Boolean = false,
 ) {
     Surface(
         modifier = Modifier
@@ -50,6 +59,8 @@ fun CustomTextField(
 
             isError = isError,
 
+            singleLine = singleLine,
+
             textStyle = URLTypography,
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = Color.Transparent,
@@ -59,19 +70,62 @@ fun CustomTextField(
     }
 }
 
-@Preview
+//@Preview
 @Composable
 fun CustomText(
-//    modifier: Modifier = Modifier,
-//    text: String
+    modifier: Modifier = Modifier,
+    url: String,
+    label: String,
+    onClick: () -> Unit = {},
 ) {
-    Column {
-        CompositionLocalProvider(LocalContentAlpha provides  ContentAlpha.medium) {
-            Text(text = "URL",
-            style = AppTypography.labelSmall,
-            )
+    Surface(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        elevation = 8.dp,
+        shape = RoundedCornerShape(10.dp),
+        color = surfaceBackgroundColor()
+    ) {
+        ConstraintLayout(modifier = Modifier.padding(vertical = 6.dp)) {
+
+            val (textColumn, icon) = createRefs()
+
+            Column(modifier = Modifier
+                .constrainAs(textColumn) {
+                    start.linkTo(parent.start, margin = 16.dp)
+                    end.linkTo(icon.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    width = Dimension.fillToConstraints
+                }
+            ) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    Text(text = label, style = UrlLabel)
+                }
+
+                SelectionContainer {
+                    Text(
+                        text = url,
+                        style = URLTypography,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                IconCopy(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .constrainAs(icon) {
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        },
+                    onClick = onClick
+                )
+            }
         }
-        Text(text = TEST_URL, style = URLTypography)
     }
 }
 
@@ -83,7 +137,7 @@ fun CustomTextFieldM3(
     readOnly: Boolean = false,
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     Surface(
         modifier = Modifier

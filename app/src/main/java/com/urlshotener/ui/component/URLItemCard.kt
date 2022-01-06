@@ -26,19 +26,19 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.urlshotener.data.URLItem
 import com.urlshotener.MainViewModel
+import com.urlshotener.tool.ApplicationToast
 import com.urlshotener.tool.copyText
-import com.urlshotener.ui.page.slideSize
+import kotlinx.coroutines.Job
 
 @ExperimentalAnimationApi
 @Composable
-private fun URLItemCardContent(
+fun URLItemCard(
     urlItem: URLItem,
     viewModel: MainViewModel,
-    bottomPadding: Dp = 0.dp
+    snackbar: (String, () -> Unit) -> Job,
 ) {
     val activity = LocalContext.current as Activity
     val context = LocalContext.current
@@ -77,7 +77,6 @@ private fun URLItemCardContent(
                     activity.window.insetsController?.hide(ime())
                 }
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .padding(bottom = bottomPadding)
                 .onGloballyPositioned {
                     size.value = it.size.height
                 },
@@ -156,58 +155,52 @@ private fun URLItemCardContent(
                             onDispose { }
                         }
 
-//                    val controller: WindowInsetsController = activity.window.insetsController
-//
-//                    activity.window.insetsController?.addOnControllableInsetsChangedListener(
-//                        WindowInsetsController.OnControllableInsetsChangedListener(
-//                            controller,
-//                            WindowInsets.Type.ime()
-//                        )
-//                    )
                     }
 
-//                    TextField(
-//                        value = titleTextFieldValue.value,
-//                        onValueChange = { titleTextFieldValue.value = it },
-//                        modifier = Modifier
-////                        .fillMaxWidth()
-////                        .wrapContentHeight()
-//                            .wrapContentSize()
-////                        .width(IntrinsicSize.Min)
-//                            .align(Alignment.CenterHorizontally)
-//                            .focusRequester(focusRequester),
-//                        colors = TextFieldDefaults.textFieldColors(
-//                            focusedIndicatorColor = Color.Transparent,
-//                            unfocusedIndicatorColor = Color.Transparent,
-//                            backgroundColor = Color.Transparent
-//                        ),
-//                        readOnly = readOnlyState.value,
-////                    enabled = true,
-//                        textStyle = MaterialTheme.typography.h5.copy(textAlign = TextAlign.Center),
+                    // Origin URL
+//                    CustomTextField(
+//                        modifier = Modifier.padding(horizontal = 16.dp),
+//                        textFieldValue = TextFieldValue(urlItem.originURL),
+//                        onValueChange = {},
+//                        label = { Text(text = "Origin URL") },
+//                        readOnly = true,
+//                        trailingIcon = { IconCopy { copyText(context, urlItem.originURL) } },
+//                        singleLine = true
 //                    )
+//
+//                    Spacer(modifier = Modifier.size(16.dp))
 
-
-                    CustomTextField(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        textFieldValue = TextFieldValue(urlItem.originURL),
-                        onValueChange = {},
-                        label = { Text(text = "Origin URL") },
-                        readOnly = true,
-                        trailingIcon = { IconCopy { copyText(context, urlItem.originURL) } },
-                        )
-
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    CustomTextField(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        textFieldValue = TextFieldValue(urlItem.shortURL),
-                        onValueChange = {},
-                        label = { Text(text = "Short URL") },
-                        readOnly = true,
-                        trailingIcon = { IconCopy { copyText(context, urlItem.shortURL) } }
+                    // Origin URL
+                    CustomText(
+                        url = urlItem.originURL,
+                        label = "Origin URL",
+                        onClick = { copyText(context, urlItem.originURL) }
                     )
 
                     Spacer(modifier = Modifier.size(16.dp))
+
+                    // Short URL
+                    CustomText(
+                        url = urlItem.shortURL,
+                        label = "Short URL",
+                        onClick = { copyText(context, urlItem.shortURL) }
+                    )
+
+
+                    Spacer(modifier = Modifier.size(16.dp))
+
+                    // Short URL
+//                    CustomTextField(
+//                        modifier = Modifier.padding(horizontal = 16.dp),
+//                        textFieldValue = TextFieldValue(urlItem.shortURL),
+//                        onValueChange = {},
+//                        label = { Text(text = "Short URL") },
+//                        readOnly = true,
+//                        trailingIcon = { IconCopy { copyText(context, urlItem.shortURL) } },
+//                        singleLine = true
+//                    )
+//
+//                    Spacer(modifier = Modifier.size(16.dp))
 
                     Text(
                         text = size.value.toString(),
@@ -245,10 +238,9 @@ private fun URLItemCardContent(
                             .padding(vertical = 5.dp)
                             .clip(RoundedCornerShape(50))
                             .clickable {
-                                viewModel.delete(urlItem)
-//                                state.targetState = false
-//                                deleteOnClick.value = true
-                                Log.d("!!!", "${urlItem.id} Click")
+                                viewModel.updateDeleteState(urlItem, 1)
+                                snackbar(urlItem.title
+                                ) { viewModel.updateDeleteState(urlItem, 0) }
                             }
                             .padding(10.dp)
                     )
@@ -261,23 +253,24 @@ private fun URLItemCardContent(
 //        Log.d("!!!", urlItem.id.toString() + " delete")
 //        viewModel.delete(urlItem)
 //    }
+
 }
 
 //@Preview
-@ExperimentalAnimationApi
-@Composable
-fun URLItemCard(
-    urlItem: URLItem,
-    viewModel: MainViewModel
-) {
-    URLItemCardContent(urlItem, viewModel)
-}
+//@ExperimentalAnimationApi
+//@Composable
+//fun URLItemCard(
+//    urlItem: URLItem,
+//    viewModel: MainViewModel,
+//) {
+//    URLItemCardContent(urlItem, viewModel)
+//}
 
-@ExperimentalAnimationApi
-@Composable
-fun URLItemCardFirst(
-    urlItem: URLItem,
-    viewModel: MainViewModel
-) {
-    URLItemCardContent(urlItem, viewModel, slideSize + 16.dp)
-}
+//@ExperimentalAnimationApi
+//@Composable
+//fun URLItemCardFirst(
+//    urlItem: URLItem,
+//    viewModel: MainViewModel
+//) {
+//    URLItemCardContent(urlItem, viewModel, slideSize + 16.dp)
+//}
