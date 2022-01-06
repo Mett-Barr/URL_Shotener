@@ -1,9 +1,7 @@
 package com.urlshotener.ui.component
 
-import android.graphics.Typeface
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -12,13 +10,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.urlshotener.data.TEST_URL
+import com.urlshotener.TEST_URL
 import com.urlshotener.ui.theme.AppTypography
 import com.urlshotener.ui.theme.URLTypography
 
@@ -30,7 +27,8 @@ fun CustomTextField(
     readOnly: Boolean = false,
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null
+    trailingIcon: @Composable (() -> Unit)? = null,
+    isError: Boolean = false
 ) {
     Surface(
         modifier = Modifier
@@ -45,10 +43,13 @@ fun CustomTextField(
             onValueChange = onValueChange,
             readOnly = readOnly,
             label = label,
+
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
-
             placeholder = { Text("My URL") },
+
+            isError = isError,
+
             textStyle = URLTypography,
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = Color.Transparent,

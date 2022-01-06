@@ -1,11 +1,8 @@
 package com.urlshotener.ui.component
 
 import android.app.Activity
-import android.content.ClipData
 import android.util.Log
-import android.view.WindowInsets
 import android.view.WindowInsets.Type.ime
-import android.view.WindowInsetsController
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
@@ -23,31 +20,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.isVisible
-import com.urlshotener.TEST_URL
 import com.urlshotener.data.URLItem
-import com.urlshotener.data.UrlShortenerViewModel
+import com.urlshotener.MainViewModel
 import com.urlshotener.tool.copyText
 import com.urlshotener.ui.page.slideSize
-import java.lang.reflect.Type
 
 @ExperimentalAnimationApi
 @Composable
 private fun URLItemCardContent(
     urlItem: URLItem,
-    viewModel: UrlShortenerViewModel,
+    viewModel: MainViewModel,
     bottomPadding: Dp = 0.dp
 ) {
     val activity = LocalContext.current as Activity
@@ -64,10 +54,6 @@ private fun URLItemCardContent(
         mutableStateOf(true)
     }
 
-    val deleteOnClick = remember {
-        mutableStateOf(false)
-    }
-
     val state = remember {
         MutableTransitionState(true).apply {
             // Start the animation immediately.
@@ -75,6 +61,10 @@ private fun URLItemCardContent(
         }
     }
     val visible = remember { mutableStateOf(true) }
+
+    val size = remember {
+        mutableStateOf(0)
+    }
 
     AnimatedVisibility(visibleState = state) {
         Card(
@@ -87,7 +77,10 @@ private fun URLItemCardContent(
                     activity.window.insetsController?.hide(ime())
                 }
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .padding(bottom = bottomPadding),
+                .padding(bottom = bottomPadding)
+                .onGloballyPositioned {
+                    size.value = it.size.height
+                },
             shape = RoundedCornerShape(16.dp),
             elevation = 8.dp,
         ) {
@@ -201,9 +194,10 @@ private fun URLItemCardContent(
                         label = { Text(text = "Origin URL") },
                         readOnly = true,
                         trailingIcon = { IconCopy { copyText(context, urlItem.originURL) } },
-
                         )
+
                     Spacer(modifier = Modifier.size(16.dp))
+
                     CustomTextField(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         textFieldValue = TextFieldValue(urlItem.shortURL),
@@ -211,11 +205,12 @@ private fun URLItemCardContent(
                         label = { Text(text = "Short URL") },
                         readOnly = true,
                         trailingIcon = { IconCopy { copyText(context, urlItem.shortURL) } }
-
                     )
+
                     Spacer(modifier = Modifier.size(16.dp))
+
                     Text(
-                        text = urlItem.id.toString(),
+                        text = size.value.toString(),
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier
                             .padding(start = 4.dp)
@@ -273,7 +268,7 @@ private fun URLItemCardContent(
 @Composable
 fun URLItemCard(
     urlItem: URLItem,
-    viewModel: UrlShortenerViewModel
+    viewModel: MainViewModel
 ) {
     URLItemCardContent(urlItem, viewModel)
 }
@@ -282,7 +277,7 @@ fun URLItemCard(
 @Composable
 fun URLItemCardFirst(
     urlItem: URLItem,
-    viewModel: UrlShortenerViewModel
+    viewModel: MainViewModel
 ) {
     URLItemCardContent(urlItem, viewModel, slideSize + 16.dp)
 }

@@ -4,7 +4,6 @@ import android.app.Activity
 import android.util.Log
 import android.view.WindowInsets
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,23 +15,15 @@ import androidx.compose.material.*
 import androidx.compose.material.FabPosition
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.ripple.rememberRipple
-//import androidx.compose.material3.*
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -45,13 +36,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.max
-import com.urlshotener.data.URLItem
-import com.urlshotener.data.UrlShortenerViewModel
+import com.urlshotener.MainViewModel
 import com.urlshotener.ui.component.CustomTextField
+import com.urlshotener.ui.component.IconCancel
 import com.urlshotener.ui.component.URLItemCard
-import com.urlshotener.ui.component.URLItemCardFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -63,13 +52,13 @@ var slideSize = 252.dp
 @ExperimentalMaterialApi
 //@ExperimentalMaterial3Api
 @Composable
-fun MainPage(viewModel: UrlShortenerViewModel) {
+fun MainPage(viewModel: MainViewModel) {
 
 
     val coroutineScope = rememberCoroutineScope()
 
     val scaffoldState = rememberScaffoldState()
-    val snackbarHostState = remember { SnackbarHostState() }
+//    val snackbarHostState = remember { SnackbarHostState() }
 
     // We save the scrolling position with this state that can also
     // be used to programmatically scroll the list
@@ -81,13 +70,6 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
             scrollState.firstVisibleItemScrollOffset
         }
     }
-    val listState by remember {
-        derivedStateOf {
-//            scrollState.layoutInfo.visibleItemsInfo.first().
-        }
-    }
-
-    fun LazyListState.isScrolledToTheStart() = layoutInfo.visibleItemsInfo.first().index == 0
 
     val viewSizeInt = remember {
         mutableStateOf(0)
@@ -247,25 +229,11 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
 
                 if (list.isNotEmpty()) {
                     item {
-                        val listSize by remember {
-                            derivedStateOf { list.size }
-                        }
+                        val listSize by viewModel.listSize.collectAsState(initial = 0)
 
-                        val spacerHeight =
-                            screenHeight - thisDp(px = 1133 + (listSize - 1) * 430) + slideSize
+                        val high: Dp by animateDpAsState(screenHeight - thisDp(px = listSize * 658))
 
-                        val spacerHeight2: Dp by animateDpAsState(screenHeight - thisDp(px = 1133 + (listSize - 1) * 430) + slideSize)
-//                        screenHeight - thisDp(px = 1133 + (listSize - 1) * 430) + slideSize
-
-                        if (spacerHeight > 0.dp) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .size(spacerHeight2)
-//                                    .animateContentSize()
-                                    .background(Color.Gray)
-                            )
-                        }
+                        if (high > 0.dp) Spacer(modifier = Modifier.height(high))
                     }
                 }
 
@@ -282,219 +250,14 @@ fun MainPage(viewModel: UrlShortenerViewModel) {
     }
 }
 
-@Composable
-fun URLItemCard(
-    urlItem: URLItem,
-    viewModel: UrlShortenerViewModel
-) {
-
-}
-
-class PP(override val values: Sequence<URLItem>) : PreviewParameterProvider<URLItem>
-
-
-@Composable
-fun ContentCard2(
-    urlItem: URLItem,
-    viewModel: UrlShortenerViewModel,
-    modifier: Modifier = Modifier,
-    padding: Dp = 0.dp
-) {
-
-    val height = remember {
-        mutableStateOf(0)
-    }
-
-    Card(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .onGloballyPositioned {
-                height.value = it.size.height
-            },
-//            .padding(bottom = padding),
-//            .then(modifier),
-        shape = RoundedCornerShape(16.dp),
-        elevation = 8.dp,
-
-        ) {
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            androidx.compose.material.Text(text = urlItem.originURL)
-            Spacer(modifier = Modifier.size(16.dp))
-            androidx.compose.material.Text(text = urlItem.shortURL)
-            Spacer(modifier = Modifier.size(16.dp))
-
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                val (dateRef, descriptionRef, buttonCopyRef, buttonDeleteRef) = createRefs()
-
-                androidx.compose.material.Text(
-                    text = urlItem.date,
-                    modifier = Modifier.constrainAs(dateRef) {
-                        start.linkTo(parent.start)
-                        bottom.linkTo(parent.bottom)
-                    }
-                )
-                androidx.compose.material.Text(
-                    text = height.value.toString(),
-                    modifier = Modifier.constrainAs(descriptionRef) {
-                        start.linkTo(dateRef.end, margin = 16.dp)
-                        bottom.linkTo(parent.bottom)
-                    }
-                )
-
-                Icon(imageVector = Icons.Rounded.Delete,
-                    contentDescription = "Delete",
-                    modifier = Modifier
-                        .constrainAs(buttonDeleteRef) {
-
-                            end.linkTo(buttonCopyRef.start, margin = 16.dp)
-                            centerVerticallyTo(parent)
-                        }
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable {
-                            viewModel.deleteById(urlItem.id)
-                            Log.d("!!!", "ContentCard2: ")
-                        }
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(10.dp)
-                )
-
-                Icon(
-                    imageVector = Icons.Rounded.ContentCopy,
-                    contentDescription = "Content Copy",
-                    modifier = Modifier
-                        .constrainAs(buttonCopyRef) {
-                            end.linkTo(parent.end)
-                            centerVerticallyTo(parent)
-                        }
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable {
-                            Log.d("!!!", "ContentCard2: ")
-                        }
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(10.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ContentCard3(
-    urlItem: URLItem,
-    viewModel: UrlShortenerViewModel,
-) {
-
-    val height = remember {
-        mutableStateOf(0)
-    }
-
-    Card(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .onGloballyPositioned {
-                height.value = it.size.height
-            }
-            .padding(bottom = slideSize + 16.dp),
-//            .then(modifier),
-        shape = RoundedCornerShape(16.dp),
-        elevation = 8.dp,
-
-        ) {
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            androidx.compose.material.Text(text = urlItem.originURL)
-            Spacer(modifier = Modifier.size(16.dp))
-            androidx.compose.material.Text(text = urlItem.shortURL)
-            Spacer(modifier = Modifier.size(16.dp))
-
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                val (dateRef, descriptionRef, buttonCopyRef, buttonDeleteRef) = createRefs()
-
-                androidx.compose.material.Text(
-                    text = urlItem.date,
-                    modifier = Modifier.constrainAs(dateRef) {
-                        start.linkTo(parent.start)
-                        bottom.linkTo(parent.bottom)
-                    }
-                )
-                androidx.compose.material.Text(
-                    text = height.value.toString(),
-                    modifier = Modifier.constrainAs(descriptionRef) {
-                        start.linkTo(dateRef.end, margin = 16.dp)
-                        bottom.linkTo(parent.bottom)
-                    }
-                )
-
-                Icon(imageVector = Icons.Rounded.Delete,
-                    contentDescription = "Delete",
-                    modifier = Modifier
-                        .constrainAs(buttonDeleteRef) {
-
-                            end.linkTo(buttonCopyRef.start, margin = 16.dp)
-                            centerVerticallyTo(parent)
-                        }
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable {
-                            viewModel.deleteById(urlItem.id)
-                            Log.d("!!!", "ContentCard2: ")
-                        }
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(10.dp)
-                )
-
-                Icon(
-                    imageVector = Icons.Rounded.ContentCopy,
-                    contentDescription = "Content Copy",
-                    modifier = Modifier
-                        .constrainAs(buttonCopyRef) {
-                            end.linkTo(parent.end)
-                            centerVerticallyTo(parent)
-                        }
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable {
-                            Log.d("!!!", "ContentCard2: ")
-                        }
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(10.dp)
-                )
-            }
-        }
-    }
-}
-
 @ExperimentalMaterialApi
 @Composable
 fun FAB(
     viewSizeDp: SizeProportion = SizeProportion(200.dp, 0.dp),
     scrollState: LazyListState,
-    viewModel: UrlShortenerViewModel,
+    viewModel: MainViewModel,
     coroutineScope: CoroutineScope,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
 
     val fabCornerShape: Dp by animateDpAsState(targetValue = viewModel.fabRoundedCornerShape.value)
@@ -537,7 +300,7 @@ fun FAB(
         // Expanded state
         Box(modifier = Modifier.alpha(alphaProportion)) {
             if (alphaProportion > 0f) {
-                ShortUrlFab(
+                ShortenUrlFab(
                     viewModel = viewModel,
                     activity = LocalContext.current as Activity,
                     scrollState = scrollState,
@@ -585,7 +348,7 @@ fun fabAnimation(
     scrollState: LazyListState,
     slideToBottom: () -> Unit = {},
     slideToNoPadding: () -> Unit = {},
-    viewModel: UrlShortenerViewModel
+    viewModel: MainViewModel,
 ): SizeProportion {
 
     // 滑動縮放
@@ -628,12 +391,12 @@ fun fabAnimation(
 }
 
 @Composable
-fun ShortUrlFab(
-    viewModel: UrlShortenerViewModel,
+fun ShortenUrlFab(
+    viewModel: MainViewModel,
     activity: Activity,
     scrollState: LazyListState,
     coroutineScope: CoroutineScope,
-    moveRange: Int
+    moveRange: Int,
 ) {
 //    val activity = LocalContext.current as Activity
 
@@ -661,7 +424,7 @@ fun ShortUrlFab(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        androidx.compose.material.Text(
+        Text(
             text = "Shorten your URL",
             textAlign = TextAlign.Center,
             maxLines = 4,
@@ -679,20 +442,18 @@ fun ShortUrlFab(
 
         CustomTextField(
             textFieldValue = viewModel.myURL.value,
-            onValueChange = { viewModel.myURL.value = it },
-            label = { androidx.compose.material.Text(text = "URL") },
-            trailingIcon = {
-                androidx.compose.material.Icon(
-                    imageVector = Icons.Rounded.ContentCopy,
-                    contentDescription = "Copy",
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .clip(RoundedCornerShape(50))
-                        .clickable {}
-                        .padding(8.dp)
-                        .size(24.dp)
-                )
+            onValueChange = {
+                viewModel.requestError.value = false
+                viewModel.myURL.value = it
             },
+            label = { Text(text = "URL") },
+            trailingIcon = {
+                IconCancel {
+                    viewModel.myURLChange("")
+                    viewModel.requestError.value = false
+                }
+            },
+            isError = viewModel.requestError.value,
             modifier = Modifier.height(100.dp)
         )
 
@@ -713,12 +474,14 @@ fun ShortUrlFab(
 
             },
             clickOK = {
-                viewModel.addNewURLItem(
-                    viewModel.myURL.value.text,
-                    viewModel.shortURL.value.text,
-                    "10/10",
-                    "qwerty"
-                )
+//                viewModel.addNewURLItem(
+//                    viewModel.myURL.value.text,
+//                    viewModel.shortURL.value.text,
+//                    "10/10",
+//                    "qwerty"
+//                )
+
+                viewModel.shortUrl(context)
             })
     }
 }

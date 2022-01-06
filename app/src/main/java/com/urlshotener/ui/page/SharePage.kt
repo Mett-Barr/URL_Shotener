@@ -26,13 +26,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.urlshotener.data.UrlShortenerViewModel
+import com.urlshotener.MainViewModel
 import com.urlshotener.ui.component.CustomButton
 import com.urlshotener.ui.component.CustomTextField
 
 @ExperimentalComposeUiApi
 @Composable
-fun SharePage(viewModel: UrlShortenerViewModel) {
+fun SharePage(viewModel: MainViewModel) {
 
     val activity = LocalContext.current as Activity
 
@@ -41,7 +41,7 @@ fun SharePage(viewModel: UrlShortenerViewModel) {
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
 
-        ShortUrlCard(viewModel = viewModel, activity = activity)
+        ShortenUrlCard(viewModel = viewModel, activity = activity)
 
 //        val focusRequester = remember { FocusRequester() }
 //        val focusManager = LocalFocusManager.current
@@ -140,9 +140,10 @@ fun SharePage(viewModel: UrlShortenerViewModel) {
 }
 
 @Composable
-fun ShortUrlCard(viewModel: UrlShortenerViewModel, activity: Activity) {
+fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
 
 //    val activity = LocalContext.current as Activity
+    val context = LocalContext.current
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -228,12 +229,14 @@ fun ShortUrlCard(viewModel: UrlShortenerViewModel, activity: Activity) {
             OperationButton(
                 clickCancel = { activity.finish() },
                 clickOK = {
-                    viewModel.addNewURLItem(
-                        viewModel.myURL.value.text,
-                        viewModel.shortURL.value.text,
-                        "10/10",
-                        "qwerty"
-                    )
+//                    viewModel.addNewURLItem(
+//                        viewModel.myURL.value.text,
+//                        viewModel.shortURL.value.text,
+//                        "10/10",
+//                        "qwerty"
+//                    )
+
+                    viewModel.shortUrl(context)
                 })
         }
     }
