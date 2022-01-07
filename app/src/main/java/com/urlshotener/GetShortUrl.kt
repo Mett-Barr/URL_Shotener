@@ -7,6 +7,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.urlshotener.tool.getDate
+import com.urlshotener.tool.getTime
+import com.urlshotener.ui.state.InputState
 
 fun getShortUrl(context: Context, viewModel: MainViewModel) {
     val queue = Volley.newRequestQueue(context)
@@ -18,12 +21,13 @@ fun getShortUrl(context: Context, viewModel: MainViewModel) {
             viewModel.addNewURLItem(
                 originURL = viewModel.myURL.value.text,
                 shortURL = response,
-                description = "Title",
-                date = "10/10"
+                title = getTime(),
+                date = getDate()
             )
         },
         {
-            viewModel.requestError.value = true
+//            viewModel.requestError.value = true
+            viewModel.inputState.value = InputState.RequestError
 //            viewModel.shortURL.value = TextFieldValue(it.toString())
             Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
             Log.d("!!!", it.toString())

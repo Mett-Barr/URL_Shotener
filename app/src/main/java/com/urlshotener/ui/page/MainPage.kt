@@ -3,6 +3,7 @@ package com.urlshotener.ui.page
 import android.app.Activity
 import android.util.Log
 import android.view.WindowInsets
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -37,6 +38,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.max
+import com.urlshotener.ui.state.InputState
 import com.urlshotener.MainViewModel
 import com.urlshotener.ui.component.CustomTextField
 import com.urlshotener.ui.component.IconCancel
@@ -82,11 +84,12 @@ fun MainPage(viewModel: MainViewModel) {
 
     val deleteSnackbar = { it: String, redo: () -> Unit ->
         coroutineScope.launch {
-            scaffoldState.snackbarHostState.showSnackbar(message = it + "已刪除", actionLabel = "復原").let {
-                when (it) {
-                    SnackbarResult.ActionPerformed -> redo.invoke()
+            scaffoldState.snackbarHostState.showSnackbar(message = it + "已刪除", actionLabel = "復原")
+                .let {
+                    when (it) {
+                        SnackbarResult.ActionPerformed -> redo.invoke()
+                    }
                 }
-            }
         }
     }
 
@@ -248,7 +251,11 @@ fun MainPage(viewModel: MainViewModel) {
 
                 if (list.isNotEmpty()) {
                     item {
-                        val listSize by viewModel.listSize.collectAsState(initial = 0)
+//                        val listSize by viewModel.listSize.collectAsState(initial = 0)
+
+                        val listSize by remember {
+                            derivedStateOf { list.size }
+                        }
 
                         val high: Dp by animateDpAsState(screenHeight - thisDp(px = listSize * 670))
 
@@ -269,6 +276,7 @@ fun MainPage(viewModel: MainViewModel) {
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun FAB(
@@ -409,6 +417,7 @@ fun fabAnimation(
     return SizeProportion(height, width)
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun ShortenUrlFab(
     viewModel: MainViewModel,
@@ -462,17 +471,22 @@ fun ShortenUrlFab(
         CustomTextField(
             textFieldValue = viewModel.myURL.value,
             onValueChange = {
-                viewModel.requestError.value = false
+                viewModel.inputState.value = InputState.Normal
                 viewModel.myURL.value = it
             },
-            label = { Text(text = "URL") },
+            label = {
+                AnimatedContent(targetState = viewModel.inputState.value.state) { it ->
+                    Text(text = it)
+                }
+            },
             trailingIcon = {
                 IconCancel {
                     viewModel.myURLChange("")
-                    viewModel.requestError.value = false
+//                    viewModel.requestError.value = false
+                    viewModel.inputStateNormal()
                 }
             },
-            isError = viewModel.requestError.value,
+            isError = viewModel.inputState.value != InputState.Normal,
             modifier = Modifier.height(100.dp)
         )
 
@@ -500,7 +514,14 @@ fun ShortenUrlFab(
 //                    "qwerty"
 //                )
 
-                viewModel.shortUrl(context)
+//                viewModel.shortUrl(context)
+
+                if (viewModel.existed(viewModel.myURL.value.text)) {
+                    viewModel.inputState.value = InputState.Existed
+                } else {
+                    viewModel.shortUrl(context)
+                }
+
             })
     }
 }

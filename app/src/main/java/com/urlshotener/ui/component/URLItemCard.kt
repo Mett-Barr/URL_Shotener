@@ -10,12 +10,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.*
@@ -23,7 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,6 +38,7 @@ import com.urlshotener.tool.ApplicationToast
 import com.urlshotener.tool.copyText
 import kotlinx.coroutines.Job
 
+@ExperimentalComposeUiApi
 @ExperimentalAnimationApi
 @Composable
 fun URLItemCard(
@@ -45,6 +51,8 @@ fun URLItemCard(
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val titleTextFieldValue = remember {
         mutableStateOf(TextFieldValue(urlItem.title))
@@ -109,6 +117,7 @@ fun URLItemCard(
                             readOnly = true,
 //                    enabled = true,
                             textStyle = MaterialTheme.typography.h5.copy(textAlign = TextAlign.Center),
+                            singleLine = true
                         )
                     } else {
                         val editable = remember {
@@ -148,6 +157,14 @@ fun URLItemCard(
                             readOnly = readOnlyState.value,
                             enabled = true,
                             textStyle = MaterialTheme.typography.h5.copy(textAlign = TextAlign.Center),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                }
+                            ),
+                            singleLine = true
                         )
 
                         DisposableEffect(Unit) {
@@ -203,7 +220,7 @@ fun URLItemCard(
 //                    Spacer(modifier = Modifier.size(16.dp))
 
                     Text(
-                        text = size.value.toString(),
+                        text = urlItem.date,
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier
                             .padding(start = 4.dp)

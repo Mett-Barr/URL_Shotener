@@ -11,8 +11,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.urlshotener.data.URLItem
 import com.urlshotener.data.URLItemDao
+import com.urlshotener.ui.state.InputState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 const val BASE_URL = "https://tinyurl.com/api-create.php?url="
 const val TEST_URL = "https://www.example.com/"
@@ -47,13 +49,21 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
 
     val closeFabOnClick = mutableStateOf(false)
 
+    val inputState = mutableStateOf(InputState.Normal)
+
+    fun inputStateNormal() {
+        inputState.value = InputState.Normal
+    }
+
 
 
     /**----------------------------------      NetWork      --------------------------------------*/
 
     fun shortUrl(context: Context) {
 
-        requestError.value = false
+//        requestError.value = false
+
+        inputStateNormal()
 
         viewModelScope.launch {
             getShortUrl(context, this@MainViewModel)
@@ -98,16 +108,22 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         return !(originURL.isBlank() || shortURL.isBlank() || date.isBlank() || description.isBlank())
     }
 
-    fun reversDeleteState(urlItem: URLItem): URLItem {
-        if (urlItem.deleted == 0) {
-            urlItem.deleted = 1
-        } else {
-            urlItem.deleted = 0
-        }
+//    fun reversDeleteState(urlItem: URLItem): URLItem {
+//        if (urlItem.deleted == 0) {
+//            urlItem.deleted = 1
+//        } else {
+//            urlItem.deleted = 0
+//        }
+//
+//        return urlItem
+//    }
 
-        return urlItem
+    fun existed(url: String): Boolean = runBlocking {
+//        viewModelScope.launch {
+//            urlItemDao.existed(url)
+//        }
+        return@runBlocking urlItemDao.existed(url) > 0
     }
-
 
 
 
@@ -124,13 +140,13 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         originURL: String,
         shortURL: String,
         date: String,
-        description: String
+        title: String
     ): URLItem {
         return URLItem(
             originURL = originURL,
             shortURL = shortURL,
             date = date,
-            title = description
+            title = title
         )
     }
 
@@ -138,9 +154,9 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         originURL: String,
         shortURL: String,
         date: String,
-        description: String
+        title: String
     ) {
-        val newURLItem = getNewURLItemEntry(originURL, shortURL, date, description)
+        val newURLItem = getNewURLItemEntry(originURL, shortURL, date, title)
         insertURLItem(newURLItem)
     }
 
