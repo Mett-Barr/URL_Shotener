@@ -8,6 +8,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import com.urlshotener.MainViewModel
 import com.urlshotener.UrlShortenerApplication
 import com.urlshotener.UrlShortenerViewModelFactory
+import com.urlshotener.data.InputDataStore
+import com.urlshotener.data.dataStore
 import com.urlshotener.ui.page.SharePage
 import com.urlshotener.ui.theme.ComposeTestTheme
 
@@ -18,7 +20,8 @@ class ShareActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels {
         UrlShortenerViewModelFactory(
             (application as UrlShortenerApplication).database
-                .urlItemDao()
+                .urlItemDao(),
+            InputDataStore(dataStore)
         )
     }
 

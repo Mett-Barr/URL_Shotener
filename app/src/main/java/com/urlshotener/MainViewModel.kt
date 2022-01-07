@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.urlshotener.data.InputDataStore
 import com.urlshotener.data.URLItem
 import com.urlshotener.data.URLItemDao
 import com.urlshotener.ui.state.InputState
@@ -19,7 +20,10 @@ import kotlinx.coroutines.runBlocking
 const val BASE_URL = "https://tinyurl.com/api-create.php?url="
 const val TEST_URL = "https://www.example.com/"
 
-class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
+class MainViewModel(
+    private val urlItemDao: URLItemDao,
+    private val inputDataStore: InputDataStore,
+) : ViewModel() {
 
     /**------------------------------        URL Input         -----------------------------------*/
 
@@ -35,6 +39,7 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         this.shortURL.value = TextFieldValue(url)
     }
 
+    val test = mutableStateOf(inputDataStore.preferenceFlow.collect {  })
 
 
     /**------------------------------        UI State        -----------------------------------*/
@@ -56,7 +61,6 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
     }
 
 
-
     /**----------------------------------      NetWork      --------------------------------------*/
 
     fun shortUrl(context: Context) {
@@ -71,7 +75,6 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
     }
 
     val requestError = mutableStateOf(false)
-
 
 
     /**----------------------------------         DataBase        --------------------------------*/
@@ -103,7 +106,7 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         originURL: String,
         shortURL: String,
         date: String,
-        description: String
+        description: String,
     ): Boolean {
         return !(originURL.isBlank() || shortURL.isBlank() || date.isBlank() || description.isBlank())
     }
@@ -126,7 +129,6 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
     }
 
 
-
     /**---------------------      Insert         ------------------------------------*/
 
 
@@ -140,7 +142,7 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         originURL: String,
         shortURL: String,
         date: String,
-        title: String
+        title: String,
     ): URLItem {
         return URLItem(
             originURL = originURL,
@@ -154,14 +156,14 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         originURL: String,
         shortURL: String,
         date: String,
-        title: String
+        title: String,
     ) {
         val newURLItem = getNewURLItemEntry(originURL, shortURL, date, title)
         insertURLItem(newURLItem)
     }
 
 
-/**---------------------      Update         ------------------------------------*/
+    /**---------------------      Update         ------------------------------------*/
 
     private fun updateURLItem(urlItem: URLItem) {
         viewModelScope.launch {
@@ -179,8 +181,7 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
     }
 
 
-
-/**---------------------      Delete         ------------------------------------*/
+    /**---------------------      Delete         ------------------------------------*/
 
     private fun deleteURLItem(urlItem: URLItem) {
         viewModelScope.launch() {
@@ -197,7 +198,7 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
         originURL: String,
         shortURL: String,
         date: String,
-        description: String
+        description: String,
     ): URLItem {
         return URLItem(
             id = id,
@@ -222,11 +223,14 @@ class MainViewModel(private val urlItemDao: URLItemDao) : ViewModel() {
 
 }
 
-class UrlShortenerViewModelFactory(private val urlItemDao: URLItemDao) : ViewModelProvider.Factory {
+class UrlShortenerViewModelFactory(
+    private val urlItemDao: URLItemDao,
+    private val inputDataStore: InputDataStore,
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainViewModel(urlItemDao) as T
+            return MainViewModel(urlItemDao, inputDataStore) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

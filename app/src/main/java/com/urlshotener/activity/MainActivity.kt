@@ -13,6 +13,8 @@ import androidx.core.view.WindowCompat
 import com.urlshotener.MainViewModel
 import com.urlshotener.UrlShortenerApplication
 import com.urlshotener.UrlShortenerViewModelFactory
+import com.urlshotener.data.InputDataStore
+import com.urlshotener.data.dataStore
 import com.urlshotener.ui.page.MainPage
 import com.urlshotener.ui.theme.ComposeTestTheme
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -24,7 +26,8 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels {
         UrlShortenerViewModelFactory(
             (application as UrlShortenerApplication).database
-                .urlItemDao()
+                .urlItemDao(),
+            InputDataStore(dataStore)
         )
     }
 
