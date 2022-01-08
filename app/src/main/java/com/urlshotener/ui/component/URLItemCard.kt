@@ -54,9 +54,20 @@ fun URLItemCard(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
+//    val title = remember {
+//        derivedStateOf { urlItem.title }
+//    }
+
     val titleTextFieldValue = remember {
         mutableStateOf(TextFieldValue(urlItem.title))
+//        derivedStateOf { urlItem.title }
     }
+
+    titleTextFieldValue.value = titleTextFieldValue.value.copy(urlItem.title)
+
+//    val textRange = remember {
+//        mutableStateOf(TextRange(0, 0))
+//    }
 
     val readOnlyState = remember {
         mutableStateOf(true)
@@ -68,203 +79,176 @@ fun URLItemCard(
             targetState = true
         }
     }
-    val visible = remember { mutableStateOf(true) }
 
     val size = remember {
         mutableStateOf(0)
     }
 
-    AnimatedVisibility(visibleState = state) {
-        Card(
-            modifier = Modifier
-                .clickable(
-                    interactionSource = MutableInteractionSource(),
-                    indication = null
-                ) {
-                    focusManager.clearFocus()
-                    activity.window.insetsController?.hide(ime())
-                }
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .onGloballyPositioned {
-                    size.value = it.size.height
-                },
-            shape = RoundedCornerShape(16.dp),
-            elevation = 8.dp,
-        ) {
-            Box {
-                Column(
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-//                    .padding(horizontal = 16.dp)
-                ) {
+//    AnimatedVisibility(visibleState = state) {
+    Card(
+        modifier = Modifier
+            .clickable(
+                interactionSource = MutableInteractionSource(),
+                indication = null
+            ) {
+                focusManager.clearFocus()
+                activity.window.insetsController?.hide(ime())
+            }
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .onGloballyPositioned {
+                size.value = it.size.height
+            },
+        shape = RoundedCornerShape(16.dp),
+        elevation = 8.dp,
+    ) {
+        Box {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+            ) {
 
-                    if (readOnlyState.value) {
-                        TextField(
-                            value = titleTextFieldValue.value,
-                            onValueChange = { titleTextFieldValue.value = it },
-                            modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-                                .wrapContentSize()
-//                        .width(IntrinsicSize.Min)
-                                .align(Alignment.CenterHorizontally),
-//                            .focusRequester(focusRequester),
-                            colors = TextFieldDefaults.textFieldColors(
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                backgroundColor = Color.Transparent
-                            ),
-                            readOnly = true,
-//                    enabled = true,
-                            textStyle = MaterialTheme.typography.h5.copy(textAlign = TextAlign.Center),
-                            singleLine = true
-                        )
-                    } else {
-                        val editable = remember {
-                            mutableStateOf(false)
-                        }
-                        TextField(
-                            value = titleTextFieldValue.value,
-                            onValueChange = { titleTextFieldValue.value = it },
-                            modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-                                .wrapContentSize()
-//                        .width(IntrinsicSize.Min)
-                                .align(Alignment.CenterHorizontally)
-//                            .onKeyEvent {  }
-                                .focusRequester(focusRequester)
-                                .onFocusChanged {
-                                    Log.d(
-                                        "!!!",
-                                        readOnlyState.value.toString() + " " + it.isFocused.toString()
-                                    )
-                                    if (it.isFocused) {
-                                        editable.value = true
-                                    }
-
-                                    if (!it.isFocused && editable.value) {
-                                        readOnlyState.value = true
-                                        urlItem.title = titleTextFieldValue.value.text
-                                        viewModel.update(urlItem)
-                                    }
-                                },
-                            colors = TextFieldDefaults.textFieldColors(
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                backgroundColor = Color.Transparent
-                            ),
-                            readOnly = readOnlyState.value,
-                            enabled = true,
-                            textStyle = MaterialTheme.typography.h5.copy(textAlign = TextAlign.Center),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboardController?.hide()
-                                    focusManager.clearFocus()
+                if (readOnlyState.value) {
+                    TextField(
+                        value = urlItem.title,
+                        onValueChange = {},
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .align(Alignment.CenterHorizontally),
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            backgroundColor = Color.Transparent
+                        ),
+                        readOnly = true,
+                        textStyle = MaterialTheme.typography.h5.copy(textAlign = TextAlign.Center),
+                        singleLine = true
+                    )
+                } else {
+                    val editable = remember {
+                        mutableStateOf(false)
+                    }
+                    TextField(
+                        value = titleTextFieldValue.value,
+                        onValueChange = {
+                            urlItem.title = it.text
+                            titleTextFieldValue.value = it
+                        },
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .align(Alignment.CenterHorizontally)
+                            .focusRequester(focusRequester)
+                            .onFocusChanged {
+                                Log.d(
+                                    "!!!",
+                                    readOnlyState.value.toString() + " " + it.isFocused.toString()
+                                )
+                                if (it.isFocused) {
+                                    editable.value = true
                                 }
-                            ),
-                            singleLine = true
-                        )
 
-                        DisposableEffect(Unit) {
-                            focusRequester.requestFocus()
-                            onDispose { }
-                        }
+                                if (!it.isFocused && editable.value) {
+                                    readOnlyState.value = true
+//                                    urlItem.title = titleTextFieldValue.value.text
+//                                    urlItem.title = titleTextFieldValue.value.text
+                                    viewModel.update(urlItem)
+                                }
+                            },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            backgroundColor = Color.Transparent
+                        ),
+                        readOnly = readOnlyState.value,
+                        enabled = true,
+                        textStyle = MaterialTheme.typography.h5.copy(textAlign = TextAlign.Center),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                                focusManager.clearFocus()
+                            }
+                        ),
+                        singleLine = true
+                    )
 
+                    DisposableEffect(Unit) {
+                        focusRequester.requestFocus()
+                        onDispose { }
                     }
 
-                    // Origin URL
-//                    CustomTextField(
-//                        modifier = Modifier.padding(horizontal = 16.dp),
-//                        textFieldValue = TextFieldValue(urlItem.originURL),
-//                        onValueChange = {},
-//                        label = { Text(text = "Origin URL") },
-//                        readOnly = true,
-//                        trailingIcon = { IconCopy { copyText(context, urlItem.originURL) } },
-//                        singleLine = true
-//                    )
-//
-//                    Spacer(modifier = Modifier.size(16.dp))
-
-                    // Origin URL
-                    CustomText(
-                        url = urlItem.originURL,
-                        label = "Origin URL",
-                        onClick = { copyText(context, urlItem.originURL) }
-                    )
-
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    // Short URL
-                    CustomText(
-                        url = urlItem.shortURL,
-                        label = "Short URL",
-                        onClick = { copyText(context, urlItem.shortURL) }
-                    )
-
-
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    // Short URL
-//                    CustomTextField(
-//                        modifier = Modifier.padding(horizontal = 16.dp),
-//                        textFieldValue = TextFieldValue(urlItem.shortURL),
-//                        onValueChange = {},
-//                        label = { Text(text = "Short URL") },
-//                        readOnly = true,
-//                        trailingIcon = { IconCopy { copyText(context, urlItem.shortURL) } },
-//                        singleLine = true
-//                    )
-//
-//                    Spacer(modifier = Modifier.size(16.dp))
-
-                    Text(
-                        text = urlItem.date,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .padding(horizontal = 16.dp)
-                    )
                 }
 
-                Row(Modifier.align(Alignment.BottomEnd)) {
 
-                    // Edit Icon
-                    Icon(
-                        imageVector = Icons.Rounded.Edit,
-                        contentDescription = "Edit",
-                        modifier = Modifier
-                            .padding(vertical = 5.dp)
-                            .clip(RoundedCornerShape(50))
-                            .clickable {
-                                val text = titleTextFieldValue.value.text
-                                titleTextFieldValue.value = titleTextFieldValue.value.copy(
-                                    selection = TextRange(0, text.length)
-                                )
-                                readOnlyState.value = !readOnlyState.value
-                            }
-                            .padding(10.dp)
-                    )
+                // Origin URL
+                CustomText(
+                    url = urlItem.originURL,
+                    label = "Origin URL",
+                    onClick = { copyText(context, urlItem.originURL) }
+                )
 
-                    // Delete Icon
-                    Icon(imageVector = Icons.Rounded.Delete,
-                        contentDescription = "Delete",
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .padding(vertical = 5.dp)
-                            .clip(RoundedCornerShape(50))
-                            .clickable {
-                                viewModel.updateDeleteState(urlItem, 1)
-                                snackbar(urlItem.title
-                                ) { viewModel.updateDeleteState(urlItem, 0) }
-                            }
-                            .padding(10.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.size(16.dp))
+
+                // Short URL
+                CustomText(
+                    url = urlItem.shortURL,
+                    label = "Short URL",
+                    onClick = { copyText(context, urlItem.shortURL) }
+                )
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                Text(
+                    text = urlItem.date,
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .padding(horizontal = 16.dp)
+                )
+            }
+
+            Row(Modifier.align(Alignment.BottomEnd)) {
+
+                // Edit Icon
+                Icon(
+                    imageVector = Icons.Rounded.Edit,
+                    contentDescription = "Edit",
+                    modifier = Modifier
+                        .padding(vertical = 5.dp)
+                        .clip(RoundedCornerShape(50))
+                        .clickable {
+
+                            val text = titleTextFieldValue.value.text
+                            titleTextFieldValue.value = titleTextFieldValue.value.copy(
+                                selection = TextRange(0, text.length)
+                            )
+
+//                            textRange.value = TextRange(0, urlItem.title.length)
+
+                            readOnlyState.value = !readOnlyState.value
+                        }
+                        .padding(10.dp)
+                )
+
+                // Delete Icon
+                Icon(imageVector = Icons.Rounded.Delete,
+                    contentDescription = "Delete",
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .padding(vertical = 5.dp)
+                        .clip(RoundedCornerShape(50))
+                        .clickable {
+                            viewModel.updateDeleteState(urlItem, 1)
+                            snackbar(urlItem.title
+                            ) { viewModel.updateDeleteState(urlItem, 0) }
+                        }
+                        .padding(10.dp)
+                )
             }
         }
     }
+
+//    textRange.value = TextRange(0, urlItem.title.length)
+//    }
 
 //    if (deleteOnClick.value && !state.targetState && !state.currentState) {
 //        Log.d("!!!", urlItem.id.toString() + " delete")

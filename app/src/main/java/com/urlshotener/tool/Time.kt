@@ -11,8 +11,10 @@ fun getTime(): String {
 
     val hour = c.get(Calendar.HOUR_OF_DAY)
     val minute = c.get(Calendar.MINUTE)
+//    val second = c.get(Calendar.SECOND)
 
     return "$year/$month/$day $hour:$minute"
+//    return "$hour:$minute:$second"
 }
 
 fun getDate(): String {

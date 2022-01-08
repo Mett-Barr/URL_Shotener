@@ -42,6 +42,7 @@ import com.urlshotener.ui.state.InputState
 import com.urlshotener.MainViewModel
 import com.urlshotener.ui.component.CustomTextField
 import com.urlshotener.ui.component.IconCancel
+import com.urlshotener.ui.component.OperationButton
 import com.urlshotener.ui.component.URLItemCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -409,7 +410,6 @@ fun fabAnimation(
     if (viewModel.closeFabOnClick.value && !fabOnClick) {
         height = 56.dp
         width = 56.dp
-        Log.d("!!!!", "height $height   width $width")
     }
 
     viewModel.fabRoundedCornerShape.value = (16 + 40 * (1 - height.value / slideSize.value)).dp
@@ -431,7 +431,7 @@ fun ShortenUrlFab(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    var text = remember { mutableStateOf("123") }
+    val text = remember { mutableStateOf("123") }
 
     val context = LocalContext.current
 
@@ -462,20 +462,18 @@ fun ShortenUrlFab(
                 .clickable(
                     interactionSource = MutableInteractionSource(),
                     indication = null
-                ) {
-                    focusManager.clearFocus()
-                    Log.d("!!!", "SharePage: ")
-                }
+                ) { focusManager.clearFocus() }
         )
 
+        // myURL
         CustomTextField(
             textFieldValue = viewModel.myURL.value,
             onValueChange = {
-                viewModel.inputState.value = InputState.Normal
                 viewModel.myURL.value = it
+                viewModel.inputStateNormal()
             },
             label = {
-                AnimatedContent(targetState = viewModel.inputState.value.state) { it ->
+                AnimatedContent(targetState = viewModel.inputState.value.state) {
                     Text(text = it)
                 }
             },
@@ -510,11 +508,9 @@ fun ShortenUrlFab(
 //                viewModel.addNewURLItem(
 //                    viewModel.myURL.value.text,
 //                    viewModel.shortURL.value.text,
-//                    "10/10",
-//                    "qwerty"
+//                    getDate(),
+//                    getTime()
 //                )
-
-//                viewModel.shortUrl(context)
 
                 if (viewModel.existed(viewModel.myURL.value.text)) {
                     viewModel.inputState.value = InputState.Existed

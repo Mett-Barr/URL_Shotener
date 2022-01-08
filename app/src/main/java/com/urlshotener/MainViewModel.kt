@@ -22,7 +22,6 @@ const val TEST_URL = "https://www.example.com/"
 
 class MainViewModel(
     private val urlItemDao: URLItemDao,
-    private val inputDataStore: InputDataStore,
 ) : ViewModel() {
 
     /**------------------------------        URL Input         -----------------------------------*/
@@ -33,14 +32,13 @@ class MainViewModel(
         this.myURL.value = TextFieldValue(url)
     }
 
-    val shortURL = mutableStateOf(TextFieldValue("qwerty"))
+    val shortURL = mutableStateOf(TextFieldValue(""))
 
     fun shortURLChange(url: String) {
         this.shortURL.value = TextFieldValue(url)
     }
 
-    val test = mutableStateOf(inputDataStore.preferenceFlow.collect {  })
-
+//    val test = mutableStateOf(inputDataStore.preferenceFlow.collect {  })
 
     /**------------------------------        UI State        -----------------------------------*/
 
@@ -225,12 +223,11 @@ class MainViewModel(
 
 class UrlShortenerViewModelFactory(
     private val urlItemDao: URLItemDao,
-    private val inputDataStore: InputDataStore,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainViewModel(urlItemDao, inputDataStore) as T
+            return MainViewModel(urlItemDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

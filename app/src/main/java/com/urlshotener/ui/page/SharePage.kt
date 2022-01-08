@@ -1,9 +1,10 @@
 package com.urlshotener.ui.page
 
 import android.app.Activity
-import android.content.res.Resources
 import android.util.Log
 import android.view.WindowInsets
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -18,18 +19,19 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.urlshotener.MainViewModel
-import com.urlshotener.ui.component.CustomButton
+import com.urlshotener.tool.copyText
 import com.urlshotener.ui.component.CustomTextField
+import com.urlshotener.ui.component.OperationButton
+import com.urlshotener.ui.state.InputState
 
+@ExperimentalAnimationApi
 @ExperimentalComposeUiApi
 @Composable
 fun SharePage(viewModel: MainViewModel) {
@@ -139,6 +141,7 @@ fun SharePage(viewModel: MainViewModel) {
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
 
@@ -185,10 +188,18 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
                     }
             )
 
+            // myURL
             CustomTextField(
                 textFieldValue = viewModel.myURL.value,
-                onValueChange = { viewModel.myURL.value = it },
-                label = { Text(text = "URL") },
+                onValueChange = {
+                    viewModel.myURL.value = it
+                    viewModel.inputStateNormal()
+                },
+                label = {
+                    AnimatedContent(targetState = viewModel.inputState.value.state) {
+                        Text(text = it)
+                    }
+                },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.ContentCopy,
@@ -196,15 +207,17 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
                         modifier = Modifier
                             .padding(4.dp)
                             .clip(RoundedCornerShape(50))
-                            .clickable {}
+                            .clickable { copyText(context, viewModel.myURL.value.text) }
                             .padding(8.dp)
                             .size(24.dp)
                     )
-                }
+                },
+                isError = viewModel.inputState.value != InputState.Normal,
             )
 
             Spacer(modifier = Modifier.size(16.dp))
 
+            // short URL
             CustomTextField(
                 textFieldValue = viewModel.shortURL.value,
                 onValueChange = { viewModel.shortURL.value = it },
@@ -217,7 +230,7 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
                         modifier = Modifier
                             .padding(4.dp)
                             .clip(RoundedCornerShape(50))
-                            .clickable {}
+                            .clickable { copyText(context, viewModel.shortURL.value.text) }
                             .padding(8.dp)
                             .size(24.dp)
                     )
@@ -236,35 +249,13 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
 //                        "qwerty"
 //                    )
 
-                    viewModel.shortUrl(context)
+                    if (viewModel.existed(viewModel.myURL.value.text)) {
+                        viewModel.inputState.value = InputState.Existed
+                    } else {
+                        viewModel.shortUrl(context)
+                    }
                 })
         }
     }
 }
 
-@Preview
-@Composable
-fun OperationButton(clickOK: () -> Unit = {}, clickCancel: () -> Unit = {}) {
-    val focusManager = LocalFocusManager.current
-    Row(modifier = Modifier.fillMaxWidth()) {
-        CustomButton(
-            text = Resources.getSystem().getString(android.R.string.cancel),
-            modifier = Modifier.weight(1f),
-            color = Color.Gray,
-        ) {
-            focusManager.clearFocus()
-            clickCancel.invoke()
-        }
-
-
-        Spacer(modifier = Modifier.size(16.dp))
-        CustomButton(
-            text = Resources.getSystem().getString(android.R.string.ok),
-            modifier = Modifier.weight(1f),
-            color = MaterialTheme.colors.primary
-        ) {
-            focusManager.clearFocus()
-            clickOK.invoke()
-        }
-    }
-}
