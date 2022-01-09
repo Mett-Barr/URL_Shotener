@@ -243,7 +243,8 @@ fun URLItemCard(
                             snackbar(urlItem.title
                             ) { viewModel.updateDeleteState(urlItem, 0) }
                         }
-                        .padding(10.dp)
+                        .padding(10.dp),
+                    tint = MaterialTheme.colors.error
                 )
             }
         }

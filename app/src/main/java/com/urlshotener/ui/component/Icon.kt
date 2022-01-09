@@ -16,17 +16,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun IconCopy(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
-//    Icon(
-//        imageVector = Icons.Rounded.ContentCopy,
-//        contentDescription = "Copy",
-//        modifier = Modifier
-//            .padding(4.dp)
-//            .clip(RoundedCornerShape(50))
-//            .clickable { onClick.invoke() }
-//            .padding(8.dp)
-//            .size(24.dp)
-//    )
-//
     IconTemplate(Icons.Rounded.ContentCopy, "Copy", onClick, modifier)
 }
 

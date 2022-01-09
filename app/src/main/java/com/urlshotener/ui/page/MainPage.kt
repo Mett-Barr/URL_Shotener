@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.max
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.urlshotener.ui.state.InputState
 import com.urlshotener.MainViewModel
 import com.urlshotener.R
@@ -58,6 +59,22 @@ var slideSize = 252.dp
 //@ExperimentalMaterial3Api
 @Composable
 fun MainPage(viewModel: MainViewModel) {
+
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = androidx.compose.material.MaterialTheme.colors.isLight
+    val backgroundColor = androidx.compose.material.MaterialTheme.colors.background
+//    val backgroundColor = androidx.compose.material.MaterialTheme.colors.background.copy(alpha = 0.8f)
+
+    SideEffect {
+        // Update all of the system bar colors to be transparent, and use
+        // dark icons if we're in light theme
+        systemUiController.setStatusBarColor(
+            color = backgroundColor,
+            darkIcons = useDarkIcons
+        )
+
+        // setStatusBarsColor() and setNavigationBarsColor() also exist
+    }
 
 
     val coroutineScope = rememberCoroutineScope()
@@ -104,9 +121,9 @@ fun MainPage(viewModel: MainViewModel) {
     ProvideWindowInsets {
         val moveRange = thisPx(dp = slideSize + 16.dp)
 
-        androidx.compose.material.Scaffold(
+        Scaffold(
             Modifier
-                .background(MaterialTheme.colorScheme.background)
+//                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
 //                .pointerInteropFilter { motionEvent ->
 //                    when (motionEvent.action) {
@@ -507,18 +524,18 @@ fun ShortenUrlFab(
 
             },
             clickOK = {
-//                viewModel.addNewURLItem(
-//                    viewModel.myURL.value.text,
-//                    viewModel.shortURL.value.text,
-//                    getDate(),
-//                    getTime()
-//                )
+                viewModel.addNewURLItem(
+                    viewModel.myURL.value.text,
+                    viewModel.myURL.value.text,
+                    "10/10", "title"
 
-                if (viewModel.existed(viewModel.myURL.value.text)) {
-                    viewModel.inputState.value = InputState.Existed
-                } else {
-                    viewModel.shortUrl(context)
-                }
+                )
+
+//                if (viewModel.existed(viewModel.myURL.value.text)) {
+//                    viewModel.inputState.value = InputState.Existed
+//                } else {
+//                    viewModel.shortUrl(context)
+//                }
 
             })
     }

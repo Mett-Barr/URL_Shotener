@@ -19,9 +19,7 @@ import com.urlshotener.data.InputDataStore
 import com.urlshotener.data.dataStore
 import com.urlshotener.ui.page.MainPage
 import com.urlshotener.ui.theme.ComposeTestTheme
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
