@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">URL Shotener</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="shortener_title">Shorten your URL</string>
+
+    <string name="url">URL</string>
+    <string name="wrong_format">Wrong Format</string>
+    <string name="existed">Existed</string>
+
+    <string name="original_url">Original URL</string>
+    <string name="short_url">Short URL</string>
 
 </resources>

@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.urlshotener.data.URLItem
 import com.urlshotener.MainViewModel
+import com.urlshotener.R
 import com.urlshotener.tool.ApplicationToast
 import com.urlshotener.tool.copyText
 import kotlinx.coroutines.Job
@@ -138,10 +140,10 @@ fun URLItemCard(
                             .align(Alignment.CenterHorizontally)
                             .focusRequester(focusRequester)
                             .onFocusChanged {
-                                Log.d(
-                                    "!!!",
-                                    readOnlyState.value.toString() + " " + it.isFocused.toString()
-                                )
+//                                Log.d(
+//                                    "!!!",
+//                                    readOnlyState.value.toString() + " " + it.isFocused.toString()
+//                                )
                                 if (it.isFocused) {
                                     editable.value = true
                                 }
@@ -182,7 +184,7 @@ fun URLItemCard(
                 // Origin URL
                 CustomText(
                     url = urlItem.originURL,
-                    label = "Origin URL",
+                    label = stringResource(id = R.string.original_url),
                     onClick = { copyText(context, urlItem.originURL) }
                 )
 
@@ -191,7 +193,7 @@ fun URLItemCard(
                 // Short URL
                 CustomText(
                     url = urlItem.shortURL,
-                    label = "Short URL",
+                    label = stringResource(id = R.string.short_url),
                     onClick = { copyText(context, urlItem.shortURL) }
                 )
 

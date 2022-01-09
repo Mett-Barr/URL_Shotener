@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortener_title">縮短網址</string>
+    <string name="url">網址</string>
+    <string name="wrong_format">格式錯誤</string>
+    <string name="existed">已存在</string>
+    <string name="original_url">原網址</string>
+    <string name="short_url">短網址</string>
+    <string name="app_name">短網址生成器</string>
+</resources>

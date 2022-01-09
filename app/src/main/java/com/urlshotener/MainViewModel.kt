@@ -1,6 +1,7 @@
 package com.urlshotener
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.Log
 import android.webkit.URLUtil
 import androidx.compose.runtime.mutableStateOf
@@ -54,9 +55,13 @@ class MainViewModel(
 
     val inputState = mutableStateOf(InputState.Normal)
 
+//    fun getState(): String = Resources.getSystem().getString(inputState.value.int)
+//    fun getState(): String = Resources.getSystem().getString(inputState.value.int)
+
     fun inputStateNormal() {
         inputState.value = InputState.Normal
     }
+
 
 
     /**----------------------------------      NetWork      --------------------------------------*/

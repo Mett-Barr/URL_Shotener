@@ -21,11 +21,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.urlshotener.MainViewModel
+import com.urlshotener.R
 import com.urlshotener.tool.copyText
 import com.urlshotener.ui.component.CustomTextField
 import com.urlshotener.ui.component.OperationButton
@@ -161,7 +163,7 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
             ) {
                 focusManager.clearFocus()
                 activity.window.insetsController?.hide(WindowInsets.Type.ime())
-                Log.d("!!!", "SharePage: ")
+//                Log.d("!!!", "SharePage: ")
             }
             .padding(36.dp)
     ) {
@@ -173,7 +175,7 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Shorten your URL",
+                text = stringResource(id = R.string.shortener_title),
                 textAlign = TextAlign.Center,
                 maxLines = 4,
                 style = MaterialTheme.typography.h5,
@@ -196,7 +198,7 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
                     viewModel.inputStateNormal()
                 },
                 label = {
-                    AnimatedContent(targetState = viewModel.inputState.value.state) {
+                    AnimatedContent(targetState = stringResource(viewModel.inputState.value.int)) {
                         Text(text = it)
                     }
                 },
@@ -221,7 +223,7 @@ fun ShortenUrlCard(viewModel: MainViewModel, activity: Activity) {
             CustomTextField(
                 textFieldValue = viewModel.shortURL.value,
                 onValueChange = { viewModel.shortURL.value = it },
-                label = { Text(text = "URL") },
+                label = { Text(text = stringResource(id = R.string.short_url)) },
                 readOnly = true,
                 trailingIcon = {
                     Icon(

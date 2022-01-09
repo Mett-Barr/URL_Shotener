@@ -36,10 +36,12 @@ import androidx.compose.ui.unit.Dp
 
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.max
 import com.urlshotener.ui.state.InputState
 import com.urlshotener.MainViewModel
+import com.urlshotener.R
 import com.urlshotener.ui.component.CustomTextField
 import com.urlshotener.ui.component.IconCancel
 import com.urlshotener.ui.component.OperationButton
@@ -453,7 +455,7 @@ fun ShortenUrlFab(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Shorten your URL",
+            text = stringResource(id = R.string.shortener_title),
             textAlign = TextAlign.Center,
             maxLines = 4,
             style = androidx.compose.material.MaterialTheme.typography.h5,
@@ -473,7 +475,7 @@ fun ShortenUrlFab(
                 viewModel.inputStateNormal()
             },
             label = {
-                AnimatedContent(targetState = viewModel.inputState.value.state) {
+                AnimatedContent(targetState = stringResource(viewModel.inputState.value.int)) {
                     Text(text = it)
                 }
             },
