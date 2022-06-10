@@ -257,8 +257,10 @@ fun MainPage(viewModel: MainViewModel) {
                 items(list) { urlItem ->
 //                    if (urlItem == list.first()) URLItemCardFirst(urlItem, viewModel)
 //                    else URLItemCard(urlItem, viewModel)
-                    URLItemCard(urlItem = urlItem, viewModel = viewModel,
-                        snackbar = deleteSnackbar
+                    URLItemCard(
+                        urlItem = urlItem,
+                        viewModel = viewModel,
+                        snackbar = deleteSnackbar,
 //                        {
 ////                            coroutineScope.launch {
 ////                                scaffoldState.snackbarHostState.showSnackbar(urlItem.title + "已刪除", "復原")
@@ -524,18 +526,18 @@ fun ShortenUrlFab(
 
             },
             clickOK = {
-                viewModel.addNewURLItem(
-                    viewModel.myURL.value.text,
-                    viewModel.myURL.value.text,
-                    "10/10", "title"
+//                viewModel.addNewURLItem(
+//                    viewModel.myURL.value.text,
+//                    viewModel.myURL.value.text,
+//                    "10/10", "title"
+//
+//                )
 
-                )
-
-//                if (viewModel.existed(viewModel.myURL.value.text)) {
-//                    viewModel.inputState.value = InputState.Existed
-//                } else {
-//                    viewModel.shortUrl(context)
-//                }
+                if (viewModel.existed(viewModel.myURL.value.text)) {
+                    viewModel.inputState.value = InputState.Existed
+                } else {
+                    viewModel.shortUrl(context)
+                }
 
             })
     }
