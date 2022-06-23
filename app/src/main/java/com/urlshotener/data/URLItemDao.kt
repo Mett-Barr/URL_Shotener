@@ -18,6 +18,9 @@ interface URLItemDao {
     @Query("SELECT * from URLItem WHERE id=:id")
     fun getItem(id: Int): Flow<URLItem>
 
+    @Query("SELECT * from URLItem WHERE `origin URL`=:url")
+    fun getItemByURL(url: String): Flow<URLItem>
+
     @Query("SELECT COUNT(`origin URL`) from URLItem WHERE `origin URL`=:url")
     suspend fun existed(url: String): Int
 

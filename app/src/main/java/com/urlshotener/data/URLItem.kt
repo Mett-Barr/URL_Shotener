@@ -21,6 +21,7 @@ data class URLItem(
     @ColumnInfo(name = "description")
     var title: String,
 
+    // 1是刪除
     @ColumnInfo(name = "deleted")
     var deleted: Int = 0
 )

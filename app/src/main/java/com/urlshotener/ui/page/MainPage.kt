@@ -108,6 +108,7 @@ fun MainPage(viewModel: MainViewModel) {
                 .let {
                     when (it) {
                         SnackbarResult.ActionPerformed -> redo.invoke()
+//                        SnackbarResult.Dismissed -> viewModel.de
                     }
                 }
         }
@@ -533,11 +534,18 @@ fun ShortenUrlFab(
 //
 //                )
 
-                if (viewModel.existed(viewModel.myURL.value.text)) {
-                    viewModel.inputState.value = InputState.Existed
-                } else {
-                    viewModel.shortUrl(context)
-                }
+//                if (viewModel.existed(viewModel.myURL.value.text)) {
+//                    // 1. 存在且未刪除
+//                    if (viewModel.get) {
+//                        viewModel.inputState.value = InputState.Existed
+//                    }
+//                    // 2. 存在但已刪除
+//                } else {
+//                    viewModel.shortUrl(context)
+//                }
+
+
+                viewModel.clickInsert(context)
 
             })
     }

@@ -1,19 +1,20 @@
 package com.urlshotener
 
 import android.content.Context
-import android.content.res.Resources
 import android.util.Log
 import android.webkit.URLUtil
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.urlshotener.data.InputDataStore
 import com.urlshotener.data.URLItem
 import com.urlshotener.data.URLItemDao
 import com.urlshotener.ui.state.InputState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -61,7 +62,6 @@ class MainViewModel(
     fun inputStateNormal() {
         inputState.value = InputState.Normal
     }
-
 
 
     /**----------------------------------      NetWork      --------------------------------------*/
@@ -131,13 +131,24 @@ class MainViewModel(
         return@runBlocking urlItemDao.existed(url) > 0
     }
 
+//    fun itemIsDeleted(): Boolean {
+//
+//    }
+
 
     /**---------------------      Insert         ------------------------------------*/
 
 
     private fun insertURLItem(urlItem: URLItem) {
         viewModelScope.launch {
-            urlItemDao.insert(urlItem)
+            //checkIsExist
+            if (urlItemDao.existed(urlItem.originURL) < 1) {
+                urlItemDao.insert(urlItem)
+            } else {
+                urlItemDao.getItemByURL(urlItem.originURL).collect {
+                    urlItemDao.update(it.copy(deleted = 0))
+                }
+            }
         }
     }
 
@@ -224,6 +235,36 @@ class MainViewModel(
 //        }
 //    }
 
+
+    // UI Intent
+
+    fun clickInsert(context: Context) {
+        viewModelScope.launch(Dispatchers.Default) {
+            myURL.value.text.also { text ->
+
+                //存在
+                if (urlItemDao.existed(text) > 0) {
+                    urlItemDao.getItemByURL(text).collect {
+
+                        // 未刪除
+                        if (it.deleted == 0) {
+                            inputState.value = InputState.Existed
+                        }
+
+                        // 已刪除
+                        else {
+                            urlItemDao.update(it.copy(deleted = 0))
+                        }
+                    }
+                }
+
+                // 不存在
+                else {
+                    shortUrl(context)
+                }
+            }
+        }
+    }
 }
 
 class UrlShortenerViewModelFactory(
