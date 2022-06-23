@@ -1,8 +1,10 @@
 package com.urlshotener.ui.page
 
+//import android.view.WindowInsets
+
+
 import android.app.Activity
 import android.util.Log
-import android.view.WindowInsets
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
@@ -10,46 +12,45 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.FabPosition
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
-
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.urlshotener.ui.state.InputState
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.urlshotener.MainViewModel
 import com.urlshotener.R
 import com.urlshotener.ui.component.CustomTextField
 import com.urlshotener.ui.component.IconCancel
 import com.urlshotener.ui.component.OperationButton
 import com.urlshotener.ui.component.URLItemCard
+import com.urlshotener.ui.state.InputState
+import com.urlshotener.ui.theme.PrimaryDark
+import com.urlshotener.ui.theme.PrimaryLight
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 var slideSize = 252.dp
 
@@ -60,18 +61,18 @@ var slideSize = 252.dp
 @Composable
 fun MainPage(viewModel: MainViewModel) {
 
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = androidx.compose.material.MaterialTheme.colors.isLight
+//    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
     val backgroundColor = androidx.compose.material.MaterialTheme.colors.background
 //    val backgroundColor = androidx.compose.material.MaterialTheme.colors.background.copy(alpha = 0.8f)
 
     SideEffect {
         // Update all of the system bar colors to be transparent, and use
         // dark icons if we're in light theme
-        systemUiController.setStatusBarColor(
-            color = backgroundColor,
-            darkIcons = useDarkIcons
-        )
+//        systemUiController.setStatusBarColor(
+//            color = backgroundColor,
+//            darkIcons = useDarkIcons
+//        )
 
         // setStatusBarsColor() and setNavigationBarsColor() also exist
     }
@@ -80,6 +81,7 @@ fun MainPage(viewModel: MainViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
     val scaffoldState = rememberScaffoldState()
+
 //    val snackbarHostState = remember { SnackbarHostState() }
 
     // We save the scrolling position with this state that can also
@@ -102,12 +104,13 @@ fun MainPage(viewModel: MainViewModel) {
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
-    val deleteSnackbar = { it: String, redo: () -> Unit ->
+    val deleteSnackbar = { it: String, undo: () -> Unit ->
         coroutineScope.launch {
-            scaffoldState.snackbarHostState.showSnackbar(message = it + "已刪除", actionLabel = "復原")
+            scaffoldState.snackbarHostState
+                .showSnackbar(message = it + "已刪除", actionLabel = "復原")
                 .let {
                     when (it) {
-                        SnackbarResult.ActionPerformed -> redo.invoke()
+                        SnackbarResult.ActionPerformed -> undo.invoke()
 //                        SnackbarResult.Dismissed -> viewModel.de
                     }
                 }
@@ -203,17 +206,32 @@ fun MainPage(viewModel: MainViewModel) {
             floatingActionButtonPosition = FabPosition.End,
 
             scaffoldState = scaffoldState,
-//            snackbarHost = {
-//                scaffoldState.snackbarHostState
-//            }
+
+            snackbarHost = { snackbarHostState ->
+                SnackbarHost(snackbarHostState) {
+                    Snackbar(
+                        actionColor = if (MaterialTheme.colors.isLight) PrimaryDark else PrimaryLight,
+                        snackbarData = it
+                    )
+                }
+            }
 
         ) {
+
+            val navigationBarsPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
+//            val padding = animateDpAsState(targetValue = if ())
+
             LazyColumn(
-                contentPadding = rememberInsetsPaddingValues(
-                    insets = LocalWindowInsets.current.systemBars,
-                    applyTop = true,
-                    applyBottom = true
-                ),
+                contentPadding = PaddingValues(top = WindowInsets.systemBars.asPaddingValues()
+                    .calculateTopPadding(),
+                    bottom = WindowInsets.navigationBars.asPaddingValues()
+                        .calculateBottomPadding() + 72.dp),
+//                rememberInsetsPaddingValues(
+//                    insets = LocalWindowInsets.current.systemBars,
+//                    applyTop = true,
+//                    applyBottom = true
+//                ),
                 state = scrollState,
                 reverseLayout = true,
                 modifier = Modifier
@@ -251,9 +269,7 @@ fun MainPage(viewModel: MainViewModel) {
                         }
                     }) {
 
-                item {
-                    Spacer(modifier = Modifier.height(slideSize + 16.dp))
-                }
+                item { Spacer(modifier = Modifier.height(slideSize - 48.dp)) }
 
                 items(list) { urlItem ->
 //                    if (urlItem == list.first()) URLItemCardFirst(urlItem, viewModel)
@@ -334,9 +350,11 @@ fun FAB(
         viewModel.onTouchEvent.value = false
     }
 
+    val padding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     Card(
         modifier = Modifier
-            .padding(start = 32.dp, bottom = 8.dp)
+            .padding(start = 32.dp, bottom = padding)
             .size(height = fabHeight, width = fabWidth),
         shape = RoundedCornerShape(fabCornerShape),
         elevation = 16.dp,
@@ -435,6 +453,7 @@ fun fabAnimation(
     }
 
     viewModel.fabRoundedCornerShape.value = (16 + 40 * (1 - height.value / slideSize.value)).dp
+//    Log.d("!!!", "fabAnimation: ${viewModel.fabRoundedCornerShape.value}")
 
     return SizeProportion(height, width)
 }
@@ -466,7 +485,7 @@ fun ShortenUrlFab(
                 indication = null
             ) {
                 focusManager.clearFocus()
-                activity.window.insetsController?.hide(WindowInsets.Type.ime())
+                activity.window.insetsController?.hide(android.view.WindowInsets.Type.ime())
             }
             .onGloballyPositioned {
                 text.value = it.size.height.toString()

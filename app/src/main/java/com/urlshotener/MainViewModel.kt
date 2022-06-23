@@ -244,18 +244,26 @@ class MainViewModel(
 
                 //存在
                 if (urlItemDao.existed(text) > 0) {
-                    urlItemDao.getItemByURL(text).collect {
 
-                        // 未刪除
-                        if (it.deleted == 0) {
-                            inputState.value = InputState.Existed
-                        }
-
-                        // 已刪除
-                        else {
-                            urlItemDao.update(it.copy(deleted = 0))
-                        }
+                    val url = urlItemDao.getItemByURL(text).first()
+                    if (url.deleted == 0) {
+                        inputState.value = InputState.Existed
+                    } else {
+                        urlItemDao.update(url.copy(deleted = 0))
                     }
+
+//                    urlItemDao.getItemByURL(text).collect {
+//
+//                        // 未刪除
+//                        if (it.deleted == 0) {
+//                            inputState.value = InputState.Existed
+//                        }
+//
+//                        // 已刪除
+//                        else {
+//                            urlItemDao.update(it.copy(deleted = 0))
+//                        }
+//                    }
                 }
 
                 // 不存在

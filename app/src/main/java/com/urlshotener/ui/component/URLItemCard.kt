@@ -241,7 +241,9 @@ fun URLItemCard(
                         .clickable {
                             viewModel.updateDeleteState(urlItem, 1)
                             snackbar(urlItem.title
-                            ) { viewModel.updateDeleteState(urlItem, 0) }
+                            ) {
+                                viewModel.updateDeleteState(urlItem, 0)
+                            }
                         }
                         .padding(10.dp),
                     tint = MaterialTheme.colors.error
