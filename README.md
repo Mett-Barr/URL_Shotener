@@ -7,3 +7,7 @@ URL Shotener
 
 about project  
 UI與架構：MVVM + Jetpack compose
+資料庫：Room
+網路請求：Volley + Moshi
+異步操作：Kotlin coroutines
+第三方庫：Google Translate API
