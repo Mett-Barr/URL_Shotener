@@ -20,7 +20,6 @@ import com.urlshotener.data.dataStore
 import com.urlshotener.ui.page.MainPage
 import com.urlshotener.ui.theme.ComposeTestTheme
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

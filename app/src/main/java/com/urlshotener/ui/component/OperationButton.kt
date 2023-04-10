@@ -23,7 +23,8 @@ fun OperationButton(clickOK: () -> Unit = {}, clickCancel: () -> Unit = {}) {
 
         // cancel Button
         CustomButton(
-            text = Resources.getSystem().getString(R.string.cancel),
+            text = "取消",
+//            text = Resources.getSystem().getString(R.string.cancel),
             modifier = Modifier.weight(1f),
             color = Color.Gray,
         ) {
@@ -35,7 +36,8 @@ fun OperationButton(clickOK: () -> Unit = {}, clickCancel: () -> Unit = {}) {
 
         // OK Button
         CustomButton(
-            text = Resources.getSystem().getString(R.string.ok),
+            text = "生成",
+//            text = Resources.getSystem().getString(R.string.ok),
             modifier = Modifier.weight(1f),
             color = MaterialTheme.colors.primary
         ) {

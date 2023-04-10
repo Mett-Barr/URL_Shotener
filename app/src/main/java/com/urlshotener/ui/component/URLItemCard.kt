@@ -1,6 +1,8 @@
 package com.urlshotener.ui.component
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.WindowInsets.Type.ime
 import androidx.compose.animation.AnimatedVisibility
@@ -16,6 +18,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.rounded.Web
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -33,6 +37,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import com.urlshotener.data.URLItem
 import com.urlshotener.MainViewModel
 import com.urlshotener.R
@@ -209,6 +214,20 @@ fun URLItemCard(
             }
 
             Row(Modifier.align(Alignment.BottomEnd)) {
+
+                // Web Icon
+                Icon(
+                    imageVector = Icons.Rounded.Language,
+                    contentDescription = "Web",
+                    modifier = Modifier
+                        .padding(vertical = 5.dp)
+                        .clip(RoundedCornerShape(50))
+                        .clickable {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlItem.shortURL))
+                            context.startActivity(intent)
+                        }
+                        .padding(10.dp)
+                )
 
                 // Edit Icon
                 Icon(
