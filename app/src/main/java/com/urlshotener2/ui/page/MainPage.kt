@@ -4,6 +4,8 @@ package com.urlshotener2.ui.page
 
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -32,18 +34,17 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.urlshotener2.MainViewModel
 import com.urlshotener2.R
-import com.urlshotener2.ui.component.CustomTextField
-import com.urlshotener2.ui.component.IconCancel
-import com.urlshotener2.ui.component.OperationButton
-import com.urlshotener2.ui.component.URLItemCard
+import com.urlshotener2.ui.component.*
 import com.urlshotener2.ui.state.InputState
 import com.urlshotener2.ui.theme.PrimaryDark
 import com.urlshotener2.ui.theme.PrimaryLight
@@ -51,6 +52,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 var slideSize = 252.dp
+const val PRIVACY_PAGE_URL = "https://mett-barr.github.io/"
 
 @ExperimentalAnimationApi
 @ExperimentalComposeUiApi
@@ -216,15 +218,18 @@ fun MainPage(viewModel: MainViewModel) {
 
         ) {
 
-            val navigationBarsPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            val navigationBarsPadding =
+                WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
 //            val padding = animateDpAsState(targetValue = if ())
 
             LazyColumn(
-                contentPadding = PaddingValues(top = WindowInsets.systemBars.asPaddingValues()
-                    .calculateTopPadding(),
+                contentPadding = PaddingValues(
+                    top = WindowInsets.systemBars.asPaddingValues()
+                        .calculateTopPadding(),
                     bottom = WindowInsets.navigationBars.asPaddingValues()
-                        .calculateBottomPadding() + 72.dp),
+                        .calculateBottomPadding() + 72.dp
+                ),
 //                rememberInsetsPaddingValues(
 //                    insets = LocalWindowInsets.current.systemBars,
 //                    applyTop = true,
@@ -478,6 +483,8 @@ fun ShortenUrlFab(
         modifier = Modifier
             .wrapContentHeight()
             .padding(16.dp)
+//            .padding(horizontal = 16.dp)
+//            .padding(bottom = 16.dp)
             .clickable(
                 interactionSource = MutableInteractionSource(),
                 indication = null
@@ -491,18 +498,48 @@ fun ShortenUrlFab(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(id = R.string.shortener_title),
-            textAlign = TextAlign.Center,
-            maxLines = 4,
-            style = androidx.compose.material.MaterialTheme.typography.h5,
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .clickable(
-                    interactionSource = MutableInteractionSource(),
-                    indication = null
-                ) { focusManager.clearFocus() }
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .padding(bottom = 8.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.shortener_title),
+                textAlign = TextAlign.Center,
+                maxLines = 4,
+                style = androidx.compose.material.MaterialTheme.typography.h5,
+                fontSize = 28.sp,
+                modifier = Modifier
+//                    .padding(bottom = 16.dp)
+                    .clickable(
+                        interactionSource = MutableInteractionSource(),
+                        indication = null
+                    ) { focusManager.clearFocus() }
+            )
+
+//            IconButton(
+//                onClick = {
+//                    val intent = Intent(Intent.ACTION_VIEW)
+//                    intent.data = Uri.parse(PRIVACY_PAGE_URL)
+//                    context.startActivity(intent)
+////                context.startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse("PRIVACY_PAGE_URL")))
+//                },
+//                modifier = Modifier.size(48.dp).padding(12.dp)
+//            ) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.info_fill0_wght400_grad0_opsz48),
+//                    contentDescription = "privacy page"
+//                )
+//            }
+
+            ClickableIcon(
+                painter = painterResource(id = R.drawable.info_fill0_wght400_grad0_opsz48),
+                contentDescription = "PRIVACY_PAGE_URL"
+            ) {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(PRIVACY_PAGE_URL)
+                context.startActivity(intent)
+            }
+        }
 
         // myURL
         CustomTextField(
